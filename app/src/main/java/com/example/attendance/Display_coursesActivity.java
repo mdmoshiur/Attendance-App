@@ -58,6 +58,7 @@ public class Display_coursesActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+
     }
 
 }
