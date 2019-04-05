@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="30dp"
+    android:layout_marginBottom="30dp"
+    >
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#AFF3B4"
+        >
+        <TextView
+            android:id="@+id/course_name_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CSE 3201"
+            android:textAlignment="center"
+            />
+        <TextView
+            android:id="@+id/series_section_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Series: 15, Section: B"
+            android:textAlignment="center"
+            android:layout_below="@+id/course_name_id"
+            />
+
+        <TextView
+            android:id="@+id/section_roll_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Roll: 1503061-1503120"
+            android:textAlignment="center"
+            android:layout_below="@+id/series_section_id"
+            />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

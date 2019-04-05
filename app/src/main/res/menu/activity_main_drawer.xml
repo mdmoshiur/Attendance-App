@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/addnewclassid"
+            android:icon="@drawable/ic_add_black_24dp"
+            android:title="Add new class" />
+        <item
+            android:id="@+id/homeid"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="Home" />
+        <item
+            android:id="@+id/uploadid"
+            android:icon="@drawable/ic_cloud_upload_black_24dp"
+            android:title="Upload" />
+
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/contactid"
+                android:icon="@drawable/ic_contact_mail_black_24dp"
+                android:title="Contact" />
+            <item
+                android:id="@+id/shareid"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+        </menu>
+    </item>
+
+</menu>
