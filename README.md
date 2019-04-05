@@ -1,2 +1,3 @@
 # Attendance-project
-Th
+This is my ongoing attendace project
+
