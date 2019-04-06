@@ -2,15 +2,18 @@ package com.example.attendance;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Display_coursesActivity extends AppCompatActivity {
     ArrayList<Course_card> courses = new ArrayList<>();
@@ -58,6 +61,26 @@ public class Display_coursesActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
+        //move items
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,0) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,@NonNull RecyclerView.ViewHolder draggedItem,@NonNull RecyclerView.ViewHolder targetItem) {
+                int dragged_position = draggedItem.getAdapterPosition();
+                int target_position = targetItem.getAdapterPosition();
+                Collections.swap(courses, dragged_position,  target_position);
+                adapter.notifyItemMoved(dragged_position, target_position);
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        //finish move code
 
     }
 
