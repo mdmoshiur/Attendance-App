@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
 public class Database_helper extends SQLiteOpenHelper {
-    private static final String db_name = "attendance";
+    private static final String db_name = "attendance.db";
     private static final String table_name = "courses";
     private static final String series = "series";
     private static final String dept = "dept";
@@ -18,7 +18,7 @@ public class Database_helper extends SQLiteOpenHelper {
     private static final String starting_roll= "starting_roll";
     private static final String ending_roll= "ending_roll";
     private static final String others_roll ="others_roll";
-    private static final int version = 3;
+    private static final int version = 1;
     private static final String create_table ="CREATE TABLE "+table_name+"(course_id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "series TEXT," +
             "dept TEXT," +

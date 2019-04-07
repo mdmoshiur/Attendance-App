@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -153,14 +154,19 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(int position) {
-        courses.get(position);
-        Intent intent = new Intent(this,new_course_activity.class);
+        Course_card clickedItem = courses.get(position);
+        Intent intent = new Intent(this,Take_att_Activity.class);
+        intent.putExtra("course_name",clickedItem.get_course_name());
+        intent.putExtra("series_dept", clickedItem.get_series_dept());
+        intent.putExtra("roll", clickedItem.get_roll());
         startActivity(intent);
     }
 
     @Override
     public void onLongClick(int position) {
         Log.d("tag","onlongClick is triggered ");
+
     }
+
 
 }

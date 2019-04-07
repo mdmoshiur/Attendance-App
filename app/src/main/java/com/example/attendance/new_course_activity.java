@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -65,7 +66,11 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
                 } else {
                     Toast.makeText(getApplicationContext(),"Row  is not inserted",Toast.LENGTH_SHORT).show();
                 }
+
                 String table_name = course_name + dept + series + section + starting_roll;
+                //eliminate space for table name
+                table_name = table_name.replaceAll("\\s","");
+                //Log.d("tag",table_name);
                 database_helper.create_attendance_table(table_name, starting_roll, ending_roll, others);
                 database_helper.insertRow(table_name, starting_roll, ending_roll, others);
 
