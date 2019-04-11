@@ -10,12 +10,10 @@ public class Take_att_Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_take_attendance);
+        setContentView(R.layout.take_attendance);
 
         Intent intent = getIntent();
-        String course_name = intent.getStringExtra("course_name");
-        String series_dept = intent.getStringExtra("series_dept");
-        String roll = intent.getStringExtra("roll");
-        Log.d("extra", course_name+", "+series_dept+", "+roll);
+        String new_col_name = intent.getStringExtra("new_col_name");
+        Log.d("tag", new_col_name);
     }
 }

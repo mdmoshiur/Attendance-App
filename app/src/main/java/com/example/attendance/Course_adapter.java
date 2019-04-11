@@ -38,6 +38,7 @@ public class Course_adapter extends RecyclerView.Adapter<Course_adapter.Course_v
         course_view_holder.course_name.setText(current_course.get_course_name());
         course_view_holder.series_dept.setText(current_course.get_series_dept());
         course_view_holder.roll.setText(current_course.get_roll());
+
     }
 
     @Override
@@ -70,19 +71,20 @@ public class Course_adapter extends RecyclerView.Adapter<Course_adapter.Course_v
 
         @Override
         public void onClick(View v) {
-            myOnClickListener.onClick(getAdapterPosition());
+            myOnClickListener.onClick(v, getAdapterPosition());
 
         }
 
         @Override
         public boolean onLongClick(View v) {
-            myOnClickListener.onLongClick(getAdapterPosition());
+            myOnClickListener.onLongClick(v, getAdapterPosition());
             return true;
         }
+
     }
     //start for onclicklistener
     public interface MyOnClickListener{
-        void onClick( int position);
-        void onLongClick(int position);
+        void onClick(View view, int position);
+        void onLongClick(View view, int position);
     }
 }

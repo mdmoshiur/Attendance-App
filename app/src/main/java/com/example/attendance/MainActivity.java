@@ -6,9 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mrecyclerView;
     private Course_adapter madapter;
     private RecyclerView.LayoutManager mlayoutManager;
+    private TextView textView;
 
     //database helper class object
     private Database_helper database_helper;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         Cursor cursor = database_helper.display_courses();
         if(cursor.getCount() != 0){
             while (cursor.moveToNext()){
+                int course_id = Integer.parseInt( cursor.getString(cursor.getColumnIndex("course_id")) );
                 String course_name = cursor.getString(cursor.getColumnIndex("course_name"));
                 String series = cursor.getString(cursor.getColumnIndex("series"));
                 String dept = cursor.getString(cursor.getColumnIndex("dept"));
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity
                 String series_dept = dept +"-"+series+", Section: "+ section;
                 String roll = "Roll: " + starting_roll+"-"+ending_roll;
                 //add to arraylist
-                courses.add(new Course_card(course_name,series_dept,roll));
+                courses.add(new Course_card(course_id, course_name,series_dept,roll));
             }
         }
         cursor.close();
@@ -72,8 +76,31 @@ public class MainActivity extends AppCompatActivity
         madapter.setMyOnClickListener(this);
         mrecyclerView.setLayoutManager(mlayoutManager);
         mrecyclerView.setAdapter(madapter);
+        registerForContextMenu(mrecyclerView);
 
         //modification end  here
+        /*
+        //move items
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,0) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,@NonNull RecyclerView.ViewHolder draggedItem,@NonNull RecyclerView.ViewHolder targetItem) {
+                int dragged_position = draggedItem.getAdapterPosition();
+                int target_position = targetItem.getAdapterPosition();
+                Collections.swap(courses, dragged_position,  target_position);
+                madapter.notifyItemMoved(dragged_position, target_position);
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(mrecyclerView);
+
+        //finish move code
+        */
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -95,6 +122,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -138,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.addnewclassid) {
             // Handle the camera action
         } else if (id == R.id.homeid) {
-            startActivity(new Intent(MainActivity.this,Display_coursesActivity.class));
+            startActivity(new Intent(MainActivity.this,MainActivity.class));
         } else if (id == R.id.uploadid) {
 
         } else if (id == R.id.contactid) {
@@ -153,19 +181,88 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(int position) {
+    public void onClick(View view, int position) {
         Course_card clickedItem = courses.get(position);
-        Intent intent = new Intent(this,Take_att_Activity.class);
-        intent.putExtra("course_name",clickedItem.get_course_name());
-        intent.putExtra("series_dept", clickedItem.get_series_dept());
-        intent.putExtra("roll", clickedItem.get_roll());
+        Intent intent = new Intent(this,AttendanceActivity.class);
+        //Log.d("tag", "id: "+ clickedItem.get_course_id());
+       // intent.putExtra("course_id",String.valueOf(clickedItem.get_course_id()));
         startActivity(intent);
     }
 
-    @Override
-    public void onLongClick(int position) {
-        Log.d("tag","onlongClick is triggered ");
+    //modification
 
+   /*
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.course_pop_up_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.updateid:
+                Toast.makeText(MainActivity.this,"update is selected",Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.backupid:
+                Toast.makeText(MainActivity.this,"backup is selected",Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.deleteid:
+                Toast.makeText(MainActivity.this,"delete is selected",Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+    }
+    //finish here
+    */
+
+    @Override
+    public void onLongClick(View view, int position) {
+        Log.d("tag","onlongClick is triggered ");
+        /*
+        PopupMenu popupMenu = new PopupMenu(this,view);
+        popupMenu.inflate(R.menu.course_pop_up_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.updateid:
+                        Toast.makeText(MainActivity.this,"update is selected",Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.backupid:
+                        Toast.makeText(MainActivity.this,"backup is selected",Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.deleteid:
+                        Toast.makeText(MainActivity.this,"delete is selected",Toast.LENGTH_SHORT).show();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        */
+        PopupMenu popupMenu = new PopupMenu(this,view);
+        popupMenu.inflate(R.menu.course_pop_up_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.updateid:
+                        Toast.makeText(MainActivity.this,"update is selected",Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.backupid:
+                        Toast.makeText(MainActivity.this,"backup is selected",Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.deleteid:
+                        Toast.makeText(MainActivity.this,"delete is selected",Toast.LENGTH_SHORT).show();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
 
