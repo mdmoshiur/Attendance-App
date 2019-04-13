@@ -1,10 +1,8 @@
 package com.example.attendance;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +23,9 @@ public class AttendanceActivity extends AppCompatActivity {
     
     private ListView listView;
     private FloatingActionButton floatingActionButton;
-    private Student_adapter  student_adapter;
+    private String TABLE_NAME;
+
+    private Database_helper database_helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +95,7 @@ public class AttendanceActivity extends AppCompatActivity {
                             //remove all spaces
                             new_col = new_col.replaceAll("\\s","");
                             Intent intent = new Intent(AttendanceActivity.this, Take_att_Activity.class);
+                            intent.putExtra("table_name", TABLE_NAME);
                             intent.putExtra("new_col_name", new_col);
                             startActivity(intent);
                             dialog.dismiss();
@@ -125,27 +126,25 @@ public class AttendanceActivity extends AppCompatActivity {
     }
 
     private void InitializeUIData() {
+        Intent intent = new Intent();
+        String table_name = "attendance_table_";
+        Bundle bundle = this.getIntent().getExtras();
+        String course_id = bundle.getString("Course_ID");
+        table_name = table_name + course_id;
+        TABLE_NAME = table_name;
+        //Log.d("TAG", "table name: "+ table_name);
         List<DataUser> dataUsers = new ArrayList<>(0);
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
-        dataUsers.add(new DataUser("1503113", "8", "90%", "R: PPPAPPPPPP"));
+        database_helper = new Database_helper(this);
+        Cursor cursor = database_helper.AttendacneSummary(table_name);
+        if (cursor.getCount()!=0){
+            while (cursor.moveToNext()){
+                String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
+                String p_att =cursor.getString(cursor.getColumnIndex("p_att"));
+
+                //add to list item
+                dataUsers.add(new DataUser(roll,"M: 5",p_att+"%", "R: PPAAPPAAPPPAAPPA"));
+            }
+        }
 
         listView.setAdapter(new Student_adapter(this, R.layout.single_student_designview, dataUsers));
 

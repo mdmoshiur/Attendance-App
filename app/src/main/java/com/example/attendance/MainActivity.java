@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         Cursor cursor = database_helper.display_courses();
         if(cursor.getCount() != 0){
             while (cursor.moveToNext()){
-                int course_id = Integer.parseInt( cursor.getString(cursor.getColumnIndex("course_id")) );
+                String course_id = cursor.getString(cursor.getColumnIndex("course_id"));
                 String course_name = cursor.getString(cursor.getColumnIndex("course_name"));
                 String series = cursor.getString(cursor.getColumnIndex("series"));
                 String dept = cursor.getString(cursor.getColumnIndex("dept"));
@@ -184,9 +184,11 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view, int position) {
         Course_card clickedItem = courses.get(position);
         Intent intent = new Intent(this,AttendanceActivity.class);
-        //Log.d("tag", "id: "+ clickedItem.get_course_id());
-       // intent.putExtra("course_id",String.valueOf(clickedItem.get_course_id()));
-        startActivity(intent);
+        Log.d("tag", "id: "+ clickedItem.get_course_id());
+        Bundle bund = new Bundle();
+        bund.putString("Course_ID",clickedItem.get_course_id());
+        intent.putExtras(bund);
+        startActivityForResult(intent,0);
     }
 
     //modification

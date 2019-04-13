@@ -86,15 +86,15 @@ public class Database_helper extends SQLiteOpenHelper {
     }
 
     //create table name
-    private static String tble_name_for_attendance ="initial";
+    private static String TABLE_NAME ="initial";
     public void  setTable_name(String table_name){
-        tble_name_for_attendance = table_name;
+        TABLE_NAME = table_name;
     }
 
     public void create_attendance_table(String tble_name, int start, int end, String others){
         //create table for new course attendance
          setTable_name(tble_name);
-         String create_table_query ="CREATE TABLE "+ tble_name_for_attendance + "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+         String create_table_query ="CREATE TABLE "+ TABLE_NAME + "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "roll_no INTEGER, "
                 + "p_att DOUBLE "
                 + ");";
@@ -109,7 +109,7 @@ public class Database_helper extends SQLiteOpenHelper {
         for(int i=start; i<= end; i++){
             contentValues.put("roll_no",i);
             contentValues.put("p_att", 0.0);
-            sqLiteDatabase.insert(tble_name_for_attendance, null,contentValues);
+            sqLiteDatabase.insert(TABLE_NAME, null,contentValues);
         }
         String[] others_roll={};
         if(!others.isEmpty()){
@@ -121,10 +121,19 @@ public class Database_helper extends SQLiteOpenHelper {
             others_roll_int[i] = Integer.parseInt(others_roll[i]);
             contentValues.put("roll_no",others_roll_int[i]);
             contentValues.put("p_att", 0.0);
-            sqLiteDatabase.insert(tble_name_for_attendance, null,contentValues);
+            sqLiteDatabase.insert(TABLE_NAME, null,contentValues);
         }
     }
 
+    //retraive list item data
+
+    public Cursor AttendacneSummary(String tble_name){
+        setTable_name(tble_name);
+        String summary_query = "SELECT * FROM "+ TABLE_NAME;
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery(summary_query,null);
+        return cursor;
+    }
 
 
 }

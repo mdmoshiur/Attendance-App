@@ -69,7 +69,7 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
                     //eliminate space for table name
                     //table_name = table_name.replaceAll("\\s","");
                     String table_name = "attendance_table_"+row_id;
-                    Log.d("tag",table_name);
+                    //Log.d("tag",table_name);
                     database_helper.create_attendance_table(table_name, starting_roll, ending_roll, others);
                     database_helper.insertRow(table_name, starting_roll, ending_roll, others);
                     //Toast.makeText(getApplicationContext(),"Row  is successfully inserted",Toast.LENGTH_SHORT).show();

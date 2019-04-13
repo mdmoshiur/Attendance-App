@@ -3,12 +3,10 @@ package com.example.attendance;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.List;
@@ -21,6 +19,7 @@ public class Student_adapter extends ArrayAdapter<DataUser> {
     public Student_adapter(@NonNull Context context, int resource, @NonNull List<DataUser> objects) {
         super(context, resource, objects);
         layout_resource = resource;
+        this.context = context;
     }
 
     private final class ViewHolder {
