@@ -6,7 +6,10 @@ import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
+
+import java.util.List;
 
 public class Database_helper extends SQLiteOpenHelper {
     private static final String db_name = "attendance.db";
@@ -87,9 +90,15 @@ public class Database_helper extends SQLiteOpenHelper {
 
     //create table name
     private static String TABLE_NAME ="initial";
+    private static String COL_NAME = "Col";
+    public static void setColName(String colName) {
+        COL_NAME = colName;
+    }
+
     public void  setTable_name(String table_name){
         TABLE_NAME = table_name;
     }
+
 
     public void create_attendance_table(String tble_name, int start, int end, String others){
         //create table for new course attendance
@@ -135,5 +144,34 @@ public class Database_helper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    //create new column for new day
+    public void AddColumn(String tble_name, String col_name){
+        setTable_name(tble_name);
+        setColName(col_name);
+        String alter_table_query = "ALTER TABLE "+ TABLE_NAME + " ADD COLUMN "+ COL_NAME+ " INTEGER DEFAULT 1;";
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        try {
+            sqLiteDatabase.execSQL(alter_table_query);
+        } catch (Exception e){
+            Log.d("tag", "Exception: "+e);
+        }
 
+    }
+
+    public void InsertTodaysAtt(String tble_name, String col_name, List<Take_att_data_node> mylist) {
+        setTable_name(tble_name);
+        setColName(col_name);
+        int sizeOfList = mylist.size();
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        for(int i= 0; i< sizeOfList; i++){
+            if(mylist.get(i).getIntegerCheckValue()!= 1) {
+                try{
+                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = "+ mylist.get(i).getIntegerCheckValue()
+                    +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
+                } catch (Exception e){
+                    Log.d("tag", "Exeception :"+ e);
+                }
+            }
+        }
+    }
 }

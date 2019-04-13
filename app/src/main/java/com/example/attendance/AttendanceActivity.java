@@ -86,7 +86,7 @@ public class AttendanceActivity extends AppCompatActivity {
                         if(cycle_day.getText()!= null){
                             Cycle_day = cycle_day.getText().toString().trim();
                         } else {
-                            Cycle_day = "";
+                            Cycle_day = "0";
                         }
 
                         if(date.getText()!=null){

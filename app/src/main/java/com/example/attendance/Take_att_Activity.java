@@ -42,12 +42,15 @@ public class Take_att_Activity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(Take_att_Activity.this, "Toaday's attendance is stored.", Toast.LENGTH_SHORT).show();
-
+                        database_helper.AddColumn(table_name, new_col_name);
+                        database_helper.InsertTodaysAtt(table_name, new_col_name, list);
+                        startActivity(new Intent(Take_att_Activity.this, AttendanceActivity.class));
                     }
                 })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                //Log.d("tag","checkvalue: "+ list.get(1).getIntegerCheckValue());
                                 dialog.cancel();
                             }
                         });
@@ -67,8 +70,11 @@ public class Take_att_Activity extends AppCompatActivity {
     private void InitializeAppData() {
         Intent intent = getIntent();
         table_name = intent.getStringExtra("table_name");
-        new_col_name = intent.getStringExtra("new_col_name");
+        String col_name = intent.getStringExtra("new_col_name");
+        col_name = col_name.replaceAll("/","_");
+        new_col_name = "day_"+col_name;
         //Log.d("tag",table_name+" / "+ new_col_name);
+
     }
 
     private void InitializeUI() {
