@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/user_icon_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/user_icon"
+        android:background="#EBE7E7"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        />
+
+    <TextView
+        android:id="@+id/sample_roll_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1503113"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/user_icon_id"
+        android:layout_toEndOf="@+id/user_icon_id"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        />
+
+    <TextView
+        android:id="@+id/sample_pofattendance_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="100%"
+        android:layout_below="@+id/sample_roll_id"
+        android:layout_alignStart="@+id/sample_roll_id"
+        android:layout_alignLeft="@+id/sample_roll_id"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textStyle="italic"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        />
+
+    <CheckBox
+        android:id="@+id/checkbox_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="256dp"
+        android:button="@null"
+        android:background="@drawable/checkbox_selector"
+         />
+
+
+</RelativeLayout>

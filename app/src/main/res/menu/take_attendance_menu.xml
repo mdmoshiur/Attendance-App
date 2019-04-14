@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/search_button_id"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="ifRoom"
+        android:title="Search" />
+    <item
+        android:id="@+id/set_all_present"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="never"
+        android:title="Set all present" />
+    <item
+        android:id="@+id/set_all_absent"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="never"
+        android:title="Set all absent" />
+    <item
+        android:id="@+id/save_id"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="never"
+        android:title="Save" />
+
+
+
+
+
+</menu>
