@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,25 +20,61 @@ import java.util.List;
 
 public class Take_att_Activity extends AppCompatActivity {
     private ListView listView;
+    private Take_att_adapter take_att_adapter;
     private Button button;
     List<Take_att_data_node> list = new ArrayList<>(0);
     private String table_name, new_col_name;
     Database_helper database_helper = new Database_helper(this);
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.take_attendance_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.set_all_present:
+                setAll(1);
+                take_att_adapter.notifyDataSetChanged();
+                return true;
+            case R.id.set_all_absent:
+                setAll(0);
+                take_att_adapter.notifyDataSetChanged();
+                return true;
+            case R.id.save_id:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    private void setAll(int value) {
+        int s= list.size();
+        for(int i=0;i<s;i++){
+            list.get(i).setCheckValue(value);
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.take_attendance);
 
         Initialize();
-        //create a new column
 
-        listView.setAdapter(new Take_att_adapter(this,R.layout.sample_take_attendance, list));
+
+        take_att_adapter = new Take_att_adapter(this,R.layout.sample_take_attendance, list);
+        listView.setAdapter(take_att_adapter);
 
         //button process
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(Take_att_Activity.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(Take_att_Activity.this);
                 builder.setMessage("Are you want to save this?");
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -44,7 +82,19 @@ public class Take_att_Activity extends AppCompatActivity {
                         Toast.makeText(Take_att_Activity.this, "Toaday's attendance is stored.", Toast.LENGTH_SHORT).show();
                         database_helper.AddColumn(table_name, new_col_name);
                         database_helper.InsertTodaysAtt(table_name, new_col_name, list);
-                        startActivity(new Intent(Take_att_Activity.this, AttendanceActivity.class));
+                        //finish();
+                        //onBackPressed();
+
+                        //pass with proper information
+                        Intent intent = new Intent(Take_att_Activity.this, AttendanceActivity.class);
+                        Bundle bund = new Bundle();
+                        //process table name
+                        String course_id = table_name;
+                        course_id = course_id.replace("attendance_table_","");
+                        bund.putString("Course_ID",course_id);
+                        intent.putExtras(bund);
+                        startActivityForResult(intent,0);
+
                     }
                 })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -88,7 +138,7 @@ public class Take_att_Activity extends AppCompatActivity {
             while (cursor.moveToNext()) {
                 String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
                 String p_att = cursor.getString(cursor.getColumnIndex("p_att"));
-                list.add(new Take_att_data_node(roll, p_att,0));
+                list.add(new Take_att_data_node(roll, p_att+"%",0));
             }
         }
     }

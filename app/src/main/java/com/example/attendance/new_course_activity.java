@@ -2,8 +2,10 @@ package com.example.attendance;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,20 +17,24 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
 
     private EditText Series_name,Dept_name,Section, Course_name, Start, End, Others;
     private Button button;
-    private TextView textView;
 
     Database_helper database_helper;
     /*
     //this variable for testing
     String mtable_name, mothers_roll;
     int mstrat, mend;
+    private Handler mHandler = new Handler();
     */
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_course);
+        //set toolbar
+        /*
+        Toolbar toolbar  = findViewById(R.id.new_course_toolbar_id);
+        setSupportActionBar(toolbar);
+        */
 
         Series_name = findViewById(R.id.series_name_id);
         Dept_name = findViewById(R.id.dept_name_id);
@@ -45,6 +51,23 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
         button.setOnClickListener(this);
 
     }
+    /*
+    //background thread
+    class MyRunnable implements Runnable {
+        @Override
+        public void run() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(new_course_activity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            });
+            database_helper.create_attendance_table(mtable_name, mstrat, mend, mothers_roll);
+            database_helper.insertRow(mtable_name, mstrat, mend, mothers_roll);
+        }
+    }
+    */
 
     @Override
     public void onClick(View v) {
@@ -70,17 +93,26 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
                     //table_name = table_name.replaceAll("\\s","");
                     String table_name = "attendance_table_"+row_id;
                     //Log.d("tag",table_name);
+
                     database_helper.create_attendance_table(table_name, starting_roll, ending_roll, others);
                     database_helper.insertRow(table_name, starting_roll, ending_roll, others);
+
                     //Toast.makeText(getApplicationContext(),"Row  is successfully inserted",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent = new Intent(new_course_activity.this, MainActivity.class);
                     startActivity(intent);
+
                     /*
                     // performance issues
                     mtable_name = table_name;
                     mstrat = starting_roll;
                     mend = ending_roll;
                     mothers_roll = others;
+
+
+                    //call for other thread
+                    MyRunnable runnable = new MyRunnable();
+                    new Thread(runnable).start();
+                    /*
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity
     public void onClick(View view, int position) {
         Course_card clickedItem = courses.get(position);
         Intent intent = new Intent(this,AttendanceActivity.class);
-        Log.d("tag", "id: "+ clickedItem.get_course_id());
+        //Log.d("tag", "id: "+ clickedItem.get_course_id());
         Bundle bund = new Bundle();
         bund.putString("Course_ID",clickedItem.get_course_id());
         intent.putExtras(bund);

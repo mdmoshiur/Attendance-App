@@ -105,8 +105,10 @@ public class Database_helper extends SQLiteOpenHelper {
          setTable_name(tble_name);
          String create_table_query ="CREATE TABLE "+ TABLE_NAME + "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "roll_no INTEGER, "
-                + "p_att DOUBLE "
-                + ");";
+                + "p_att INTEGER DEFAULT 0, "
+                 + "marks INTEGER DEFAULT 0, "
+                 +"attend INTEGER DEFAULT 0  "
+                 + ");";
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         sqLiteDatabase.execSQL(create_table_query);
     }
@@ -117,7 +119,6 @@ public class Database_helper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         for(int i=start; i<= end; i++){
             contentValues.put("roll_no",i);
-            contentValues.put("p_att", 0.0);
             sqLiteDatabase.insert(TABLE_NAME, null,contentValues);
         }
         String[] others_roll={};
@@ -129,7 +130,6 @@ public class Database_helper extends SQLiteOpenHelper {
         for(int i=0;i<len;i++){
             others_roll_int[i] = Integer.parseInt(others_roll[i]);
             contentValues.put("roll_no",others_roll_int[i]);
-            contentValues.put("p_att", 0.0);
             sqLiteDatabase.insert(TABLE_NAME, null,contentValues);
         }
     }
@@ -148,7 +148,7 @@ public class Database_helper extends SQLiteOpenHelper {
     public void AddColumn(String tble_name, String col_name){
         setTable_name(tble_name);
         setColName(col_name);
-        String alter_table_query = "ALTER TABLE "+ TABLE_NAME + " ADD COLUMN "+ COL_NAME+ " INTEGER DEFAULT 1;";
+        String alter_table_query = "ALTER TABLE "+ TABLE_NAME + " ADD COLUMN "+ COL_NAME+ " INTEGER DEFAULT 0;";
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try {
             sqLiteDatabase.execSQL(alter_table_query);
@@ -162,16 +162,47 @@ public class Database_helper extends SQLiteOpenHelper {
         setTable_name(tble_name);
         setColName(col_name);
         int sizeOfList = mylist.size();
+        String query_for_size = "select * from "+ TABLE_NAME;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        int total_class = sqLiteDatabase.rawQuery(query_for_size, null).getColumnCount()-5;
+        Log.d("tag", "total class: " + total_class);
         for(int i= 0; i< sizeOfList; i++){
-            if(mylist.get(i).getIntegerCheckValue()!= 1) {
+            if(mylist.get(i).getIntegerCheckValue()== 1) {
                 try{
-                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = "+ mylist.get(i).getIntegerCheckValue()
+                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 1 , attend = attend + 1, "
+                            + " p_att = round(((attend+1)*1.0/"+total_class+")*100,2) "
                     +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
+                } catch (Exception e){
+                    Log.d("tag", "Exeception :"+ e);
+                }
+            } else {
+                try{
+                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " set p_att = round((attend*1.0/"+total_class+")*100,2) "
+                            +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
                 } catch (Exception e){
                     Log.d("tag", "Exeception :"+ e);
                 }
             }
         }
+        UpdateMarks();
     }
+
+    public void UpdateMarks(){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        try{
+            sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " set marks = case "
+                    +" when p_att >= 90.0 then 8 "
+                    +" when p_att >= 85.0 then 7 "
+                    +" when p_att >= 80.0 then 6 "
+                    +" when p_att >= 70.0 then 5 "
+                    +" when p_att >= 60.0 then 4 "
+                    +" when p_att < 60.0 then 0 "
+                    +" end "
+                    +" where 1"
+                    + ";");
+        } catch (Exception e){
+            Log.d("tag", "Exeception :"+ e);
+        }
+    }
+
 }

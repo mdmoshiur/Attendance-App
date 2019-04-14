@@ -126,7 +126,6 @@ public class AttendanceActivity extends AppCompatActivity {
     }
 
     private void InitializeUIData() {
-        Intent intent = new Intent();
         String table_name = "attendance_table_";
         Bundle bundle = this.getIntent().getExtras();
         String course_id = bundle.getString("Course_ID");
@@ -136,13 +135,24 @@ public class AttendanceActivity extends AppCompatActivity {
         List<DataUser> dataUsers = new ArrayList<>(0);
         database_helper = new Database_helper(this);
         Cursor cursor = database_helper.AttendacneSummary(table_name);
+        int latest_col = cursor.getColumnCount()-1;
         if (cursor.getCount()!=0){
             while (cursor.moveToNext()){
                 String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
                 String p_att =cursor.getString(cursor.getColumnIndex("p_att"));
-
+                String marks = cursor.getString(cursor.getColumnIndex("marks"));
+                StringBuilder recent = new StringBuilder();
+                recent.append("R: ");
+                for(int i = latest_col; i>4 && latest_col-i <= 7; i--){
+                    if(cursor.getString(i).equals("1")){
+                        recent.append("P");
+                    }
+                    else
+                        recent.append("A");
+                }
+                String r = recent.toString();
                 //add to list item
-                dataUsers.add(new DataUser(roll,"M: 5",p_att+"%", "R: PPAAPPAAPPPAAPPA"));
+                dataUsers.add(new DataUser(roll,"M: "+marks,p_att+"%", r));
             }
         }
 
