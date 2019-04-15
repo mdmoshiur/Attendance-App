@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Student_adapter extends ArrayAdapter<DataUser> {
-
+    private List<DataUser> dataUserList = new ArrayList<>(0);
     private int layout_resource;
     private Context context;
 
@@ -20,6 +22,7 @@ public class Student_adapter extends ArrayAdapter<DataUser> {
         super(context, resource, objects);
         layout_resource = resource;
         this.context = context;
+        this.dataUserList.addAll(objects);
     }
 
     private final class ViewHolder {
@@ -56,4 +59,38 @@ public class Student_adapter extends ArrayAdapter<DataUser> {
         return convertView;
 
     }
+
+    @NonNull
+    @Override
+    public Filter getFilter() {
+        return myFilter;
+    }
+
+    private Filter myFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<DataUser> filteredList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(dataUserList);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (DataUser item : dataUserList) {
+                    if (item.getRoll().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            clear();
+            addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }

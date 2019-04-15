@@ -1,13 +1,18 @@
 package com.example.attendance;
 
 public class DataUser {
-    private String roll, marks, pofattendance, recent;
+    private String row_id,roll, marks, pofattendance, recent;
 
-    public DataUser(String roll, String marks, String pofattendance, String recent) {
+    public DataUser(String id, String roll, String marks, String pofattendance, String recent) {
+        this.row_id = id;
         this.roll = roll;
         this.marks = marks;
         this.pofattendance = pofattendance;
         this.recent = recent;
+    }
+
+    public String getRowId(){
+        return row_id;
     }
 
     public String getRoll() {

@@ -4,21 +4,20 @@
     <item
         android:id="@+id/search_button_id"
         android:icon="@drawable/ic_search"
-        app:showAsAction="ifRoom"
-        android:title="Search" />
+        app:showAsAction="ifRoom|collapseActionView"
+        android:title="Search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        />
     <item
         android:id="@+id/set_all_present"
-        android:icon="@drawable/ic_search"
         app:showAsAction="never"
         android:title="Set all present" />
     <item
         android:id="@+id/set_all_absent"
-        android:icon="@drawable/ic_search"
         app:showAsAction="never"
         android:title="Set all absent" />
     <item
         android:id="@+id/save_id"
-        android:icon="@drawable/ic_search"
         app:showAsAction="never"
         android:title="Save" />
 

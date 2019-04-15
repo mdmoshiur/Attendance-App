@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,25 @@ public class Take_att_Activity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //actionbarUp button action
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.search_button_id:
+                SearchView searchView = (SearchView) item.getActionView();
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        take_att_adapter.getFilter().filter(newText);
+                        return false;
+                    }
+                });
+                return true;
             case R.id.set_all_present:
                 setAll(1);
                 take_att_adapter.notifyDataSetChanged();
@@ -58,11 +78,26 @@ public class Take_att_Activity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        //pass with proper information
+        Intent intent = new Intent(Take_att_Activity.this, AttendanceActivity.class);
+        Bundle bund = new Bundle();
+        //process table name
+        String course_id = table_name;
+        course_id = course_id.replace("attendance_table_","");
+        bund.putString("Course_ID",course_id);
+        intent.putExtras(bund);
+        startActivityForResult(intent,0);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.take_attendance);
+        getSupportActionBar().setTitle("Take today's Attendance");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Initialize();
 
@@ -83,17 +118,7 @@ public class Take_att_Activity extends AppCompatActivity {
                         database_helper.AddColumn(table_name, new_col_name);
                         database_helper.InsertTodaysAtt(table_name, new_col_name, list);
                         //finish();
-                        //onBackPressed();
-
-                        //pass with proper information
-                        Intent intent = new Intent(Take_att_Activity.this, AttendanceActivity.class);
-                        Bundle bund = new Bundle();
-                        //process table name
-                        String course_id = table_name;
-                        course_id = course_id.replace("attendance_table_","");
-                        bund.putString("Course_ID",course_id);
-                        intent.putExtras(bund);
-                        startActivityForResult(intent,0);
+                        onBackPressed();
 
                     }
                 })

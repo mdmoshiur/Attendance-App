@@ -20,7 +20,7 @@
             android:id="@+id/series_name_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Series"
+            android:hint="Series*"
             android:inputType="text"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
@@ -34,7 +34,7 @@
             android:id="@+id/dept_name_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Department"
+            android:hint="Department*"
             android:inputType="text"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
@@ -48,7 +48,7 @@
             android:id="@+id/section_name_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Section"
+            android:hint="Section*"
             android:inputType="text"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
@@ -63,7 +63,7 @@
             android:id="@+id/course_name_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Course Name"
+            android:hint="Course Name*"
             android:inputType="text"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
@@ -78,7 +78,7 @@
             android:id="@+id/start_roll_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Starting Roll"
+            android:hint="Starting Roll*"
             android:inputType="number"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
@@ -92,7 +92,7 @@
             android:id="@+id/end_roll_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ending Roll"
+            android:hint="Ending Roll*"
             android:inputType="number"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>

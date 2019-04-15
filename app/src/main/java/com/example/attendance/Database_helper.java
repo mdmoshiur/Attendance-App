@@ -2,8 +2,10 @@ package com.example.attendance;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -91,11 +93,11 @@ public class Database_helper extends SQLiteOpenHelper {
     //create table name
     private static String TABLE_NAME ="initial";
     private static String COL_NAME = "Col";
-    public static void setColName(String colName) {
+    private static void setColName(String colName) {
         COL_NAME = colName;
     }
 
-    public void  setTable_name(String table_name){
+    private void  setTable_name(String table_name){
         TABLE_NAME = table_name;
     }
 
@@ -131,6 +133,39 @@ public class Database_helper extends SQLiteOpenHelper {
             others_roll_int[i] = Integer.parseInt(others_roll[i]);
             contentValues.put("roll_no",others_roll_int[i]);
             sqLiteDatabase.insert(TABLE_NAME, null,contentValues);
+        }
+    }
+
+    public void AddStudent(String tble_name, String others) {
+        setTable_name(tble_name);
+        ContentValues contentValues = new ContentValues();
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        String[] others_roll={};
+        if(!others.isEmpty()){
+            others_roll = others.split("\\s*,\\s*");
+        }
+        int len = others_roll.length;
+        Integer[] others_roll_int = new Integer[len];
+        for(int i=0;i<len;i++){
+            others_roll_int[i] = Integer.parseInt(others_roll[i]);
+            contentValues.put("roll_no",others_roll_int[i]);
+            sqLiteDatabase.insert(TABLE_NAME, null,contentValues);
+        }
+
+    }
+    private static int  Row_id;
+    private void setRow_id(String id){
+        Row_id = Integer.parseInt(id);
+    }
+    public void deleteRow(String tble_name, String id){
+        setTable_name(tble_name);
+        setRow_id(id);
+        String delete_query = "Delete from "+ TABLE_NAME +" where id = "+ Row_id+ " ;";
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        try {
+            sqLiteDatabase.execSQL(delete_query);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

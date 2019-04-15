@@ -30,6 +30,8 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_course);
+        getSupportActionBar().setTitle("Create new Course");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //set toolbar
         /*
         Toolbar toolbar  = findViewById(R.id.new_course_toolbar_id);
@@ -78,7 +80,11 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
             String course_name = Course_name.getText().toString().trim();
             String start = Start.getText().toString().trim();
             String end = End.getText().toString().trim();
-            String others = Others.getText().toString().trim();
+            String others = null;
+            if(Others.getText()!= null){
+                 others = Others.getText().toString().trim();
+            }
+
             //create buttun is clicked
             Integer starting_roll = Integer.parseInt(start);
             Integer ending_roll = Integer.parseInt(end);
