@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/image_back"
+    >
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You can insert single roll or multiple rolls"
+        android:textStyle="italic"
+        android:textSize="18sp"
+        android:textAlignment="textStart"
+        android:textColor="#FFFEFE"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"
+        android:gravity="start" />
+    <EditText
+        android:id="@+id/roll_edit_id"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:hint="enter roll here.To differentiate two rolls put a comma(,) in between tow rolls."
+        android:layout_below="@+id/textView"
+        android:layout_margin="16dp"
+        android:cursorVisible="true"
+        android:background="@null"
+        android:layout_alignParentLeft="true"
+        android:textAlignment="textStart"
+        android:gravity="start" />
+    <Button
+        android:id="@+id/add_button_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add "
+        android:background="@drawable/gradient_design"
+        android:layout_below="@+id/roll_edit_id"
+        android:layout_margin="16dp"
+        android:layout_alignParentLeft="true"
+        android:textColor="#000"
+
+        />
+
+</RelativeLayout>

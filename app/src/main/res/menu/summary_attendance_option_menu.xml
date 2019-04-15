@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/app_bar_search_id"
+        android:icon="@drawable/ic_search"
+        android:title="Search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+    <item android:id="@+id/add_new_student_id"
+        android:title="Add new student"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/remove_student_id"
+        android:title="Remove student"
+        app:showAsAction="never"
+        />
+    <item android:id="@+id/filter_by_id"
+        android:title="Filter by"
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/highest_att_id"
+                android:title="Highest attendance"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/lowest_att_id"
+                android:title="Lowest attendance"
+                app:showAsAction="never"/>
+        </menu>
+
+    </item>
+</menu>
