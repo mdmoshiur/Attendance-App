@@ -20,8 +20,6 @@
             android:layout_height="wrap_content"
             android:hint="Date*"
             android:editable="false"
-            android:focusable="true"
-            android:cursorVisible="true"
             />
     </android.support.design.widget.TextInputLayout>
 
@@ -31,11 +29,25 @@
         android:layout_height="wrap_content">
 
         <EditText
+            android:id="@+id/cycle_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cycle*"
+            android:inputType="numberDecimal"
+            android:singleLine="true" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/day_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
             android:id="@+id/day_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Cycle Day"
-            android:inputType="text"
+            android:hint="Day*"
+            android:inputType="textCapCharacters"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 

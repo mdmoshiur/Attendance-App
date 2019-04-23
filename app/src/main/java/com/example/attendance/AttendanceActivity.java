@@ -4,10 +4,13 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class AttendanceActivity extends AppCompatActivity {
@@ -98,6 +103,7 @@ public class AttendanceActivity extends AppCompatActivity {
             }
         });
 
+
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,7 +117,8 @@ public class AttendanceActivity extends AppCompatActivity {
 
                 //process for edit text
                 final EditText date = mView.findViewById(R.id.date_id);
-                final EditText cycle_day = mView.findViewById(R.id.day_id);
+                final EditText cycle = mView.findViewById(R.id.cycle_id);
+                final EditText day = mView.findViewById(R.id.day_id);
                 Button mButton = mView.findViewById(R.id.submit_button);
 
                 //open date picker
@@ -139,16 +146,14 @@ public class AttendanceActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         String Date;
-                        String Cycle_day;
-                        if(cycle_day.getText()!= null){
-                            Cycle_day = cycle_day.getText().toString().trim();
-                        } else {
-                            Cycle_day = "0";
-                        }
+                        String Cycle;
+                        String Day;
 
-                        if(date.getText()!=null){
+                        if(date.getText()!=null && cycle.getText() != null && day.getText() != null){
                             Date = date.getText().toString().trim();
-                            String new_col = Date +"_"+ Cycle_day;
+                            Cycle = cycle.getText().toString().trim();
+                            Day = day.getText().toString().trim();
+                            String new_col = "cycle_"+Cycle+"_day_"+ Day +"_date_"+ Date;
                             //remove all spaces
                             new_col = new_col.replaceAll("\\s","");
                             Intent intent = new Intent(AttendanceActivity.this, Take_att_Activity.class);
@@ -156,7 +161,7 @@ public class AttendanceActivity extends AppCompatActivity {
                             intent.putExtra("new_col_name", new_col);
                             startActivity(intent);
                         } else {
-                            Toast.makeText(AttendanceActivity.this,"Please enter date!!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AttendanceActivity.this,"Please fill up all !!", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -221,8 +226,22 @@ public class AttendanceActivity extends AppCompatActivity {
             case R.id.filter_by_id:
                 return true;
             case R.id.highest_att_id:
+                Collections.sort(dataUsers, new Comparator<DataUser>() {
+                    @Override
+                    public int compare(DataUser o1, DataUser o2) {
+                        Double p1 = Double.parseDouble(o1.getPofattendance());
+                        Double p2 = Double.parseDouble(o2.getPofattendance());
+                        return p2.compareTo(p1);
+                    }
+                });
+                student_adapter.notifyDataSetChanged();
                 return true;
             case R.id.lowest_att_id:
+                Collections.sort(dataUsers, new MyComparetor());
+                student_adapter.notifyDataSetChanged();
+                return true;
+            case R.id.summary_id:
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -272,12 +291,22 @@ public class AttendanceActivity extends AppCompatActivity {
                 }
                 String r = recent.toString();
                 //add to list item
-                dataUsers.add(new DataUser(row_id, roll,"M: "+marks,p_att+"%", r));
+                dataUsers.add(new DataUser(row_id, roll, marks, p_att, r));
             }
         }
         student_adapter = new Student_adapter(this, R.layout.single_student_designview, dataUsers);
         listView.setAdapter(student_adapter);
 
+    }
+
+    //comparator
+    public class MyComparetor implements Comparator<DataUser> {
+        @Override
+        public int compare(DataUser o1, DataUser o2) {
+            Double p1 = Double.parseDouble(o1.getPofattendance());
+            Double p2 = Double.parseDouble(o2.getPofattendance());
+            return p1.compareTo(p2);
+        }
     }
 
 

@@ -52,8 +52,8 @@ public class Student_adapter extends ArrayAdapter<DataUser> {
 
         DataUser current = getItem(position);
         viewHolder.roll.setText(current.getRoll());
-        viewHolder.marks.setText(current.getMarks());
-        viewHolder.pofattenance.setText(current.getPofattendance());
+        viewHolder.marks.setText("M: "+ current.getMarks());
+        viewHolder.pofattenance.setText(current.getPofattendance()+"%");
         viewHolder.recent.setText(current.getRecent());
 
         return convertView;

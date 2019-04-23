@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Series*"
-            android:inputType="text"
+            android:inputType="number"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Department*"
-            android:inputType="text"
+            android:inputType="textCapCharacters"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Section*"
-            android:inputType="text"
+            android:inputType="textCapCharacters"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Course Name*"
-            android:inputType="text"
+            android:inputType="textCapCharacters"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 

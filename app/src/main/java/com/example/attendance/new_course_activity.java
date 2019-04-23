@@ -32,11 +32,6 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_new_course);
         getSupportActionBar().setTitle("Create new Course");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //set toolbar
-        /*
-        Toolbar toolbar  = findViewById(R.id.new_course_toolbar_id);
-        setSupportActionBar(toolbar);
-        */
 
         Series_name = findViewById(R.id.series_name_id);
         Dept_name = findViewById(R.id.dept_name_id);

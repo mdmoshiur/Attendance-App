@@ -12,10 +12,6 @@
         android:title="Add new student"
         app:showAsAction="never"
         />
-    <item android:id="@+id/remove_student_id"
-        android:title="Remove student"
-        app:showAsAction="never"
-        />
     <item android:id="@+id/filter_by_id"
         android:title="Filter by"
         app:showAsAction="never">
@@ -30,4 +26,8 @@
         </menu>
 
     </item>
+    <item
+        android:id="@+id/summary_id"
+        android:title="Summary"
+        app:showAsAction="never"/>
 </menu>

@@ -90,6 +90,7 @@ public class Database_helper extends SQLiteOpenHelper {
         return cursor;
     }
 
+
     //create table name
     private static String TABLE_NAME ="initial";
     private static String COL_NAME = "Col";
@@ -161,6 +162,18 @@ public class Database_helper extends SQLiteOpenHelper {
         setTable_name(tble_name);
         setRow_id(id);
         String delete_query = "Delete from "+ TABLE_NAME +" where id = "+ Row_id+ " ;";
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        try {
+            sqLiteDatabase.execSQL(delete_query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //delete course
+    public void deleteCourse(String id) {
+        setRow_id(id);
+        String delete_query = "Delete from "+ table_name +" where course_id = "+ Row_id+ " ;";
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try {
             sqLiteDatabase.execSQL(delete_query);

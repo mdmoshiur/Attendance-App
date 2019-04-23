@@ -1,10 +1,14 @@
 package com.example.attendance;
 
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -21,13 +25,17 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Course_adapter.MyOnClickListener {
     //modification start here
-    ArrayList<Course_card> courses = new ArrayList<>();
+    ArrayList<Course_data> courses = new ArrayList<>();
     //variables for courses
     private RecyclerView mrecyclerView;
     private Course_adapter madapter;
@@ -37,8 +45,6 @@ public class MainActivity extends AppCompatActivity
     //database helper class object
     private Database_helper database_helper;
 
-    //modification end here
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,29 +52,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //modification start here
-        //display courses
-
         //create arraylist for courses
-        database_helper = new Database_helper(this);
-        Cursor cursor = database_helper.display_courses();
-        if(cursor.getCount() != 0){
-            while (cursor.moveToNext()){
-                String course_id = cursor.getString(cursor.getColumnIndex("course_id"));
-                String course_name = cursor.getString(cursor.getColumnIndex("course_name"));
-                String series = cursor.getString(cursor.getColumnIndex("series"));
-                String dept = cursor.getString(cursor.getColumnIndex("dept"));
-                String section = cursor.getString(cursor.getColumnIndex("section"));
-                String starting_roll = cursor.getString(cursor.getColumnIndex("starting_roll"));
-                String ending_roll = cursor.getString(cursor.getColumnIndex("ending_roll"));
-
-                String series_dept = dept +"-"+series+", Section: "+ section;
-                String roll = "Roll: " + starting_roll+"-"+ending_roll;
-                //add to arraylist
-                courses.add(new Course_card(course_id, course_name,series_dept,roll));
-            }
-        }
-        cursor.close();
+        loadCourseData();
 
         mrecyclerView = findViewById(R.id.course_recyclerview_id);
         mrecyclerView.setHasFixedSize(true);
@@ -77,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         madapter.setMyOnClickListener(this);
         mrecyclerView.setLayoutManager(mlayoutManager);
         mrecyclerView.setAdapter(madapter);
-        registerForContextMenu(mrecyclerView);
+       // registerForContextMenu(mrecyclerView);
 
         //modification end  here
         ///*
@@ -89,6 +74,7 @@ public class MainActivity extends AppCompatActivity
                 int target_position = targetItem.getAdapterPosition();
                 Collections.swap(courses, dragged_position,  target_position);
                 madapter.notifyItemMoved(dragged_position, target_position);
+                //saveData();
                 return true;
             }
 
@@ -101,8 +87,6 @@ public class MainActivity extends AppCompatActivity
         itemTouchHelper.attachToRecyclerView(mrecyclerView);
 
         //finish move code
-        //*/
-
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -126,13 +110,75 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void loadCourseData() {
+        database_helper = new Database_helper(this);
+        Cursor cursor = database_helper.display_courses();
+        if(cursor.getCount() != 0){
+            while (cursor.moveToNext()){
+                String course_id = cursor.getString(cursor.getColumnIndex("course_id"));
+                String course_name = cursor.getString(cursor.getColumnIndex("course_name"));
+                String series = cursor.getString(cursor.getColumnIndex("series"));
+                String dept = cursor.getString(cursor.getColumnIndex("dept"));
+                String section = cursor.getString(cursor.getColumnIndex("section"));
+                String starting_roll = cursor.getString(cursor.getColumnIndex("starting_roll"));
+                String ending_roll = cursor.getString(cursor.getColumnIndex("ending_roll"));
+
+                String series_dept = dept +"-"+series+", Section: "+ section;
+                String roll = "Roll: " + starting_roll+"-"+ending_roll;
+                //add to arraylist
+                courses.add(new Course_data(course_id, course_name,series_dept,roll));
+            }
+        }
+        cursor.close();
+    }
+    /*
+    private void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("course_list", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(courses);
+        editor.putString("My_changes", json);
+        editor.apply();
+    }
+
+    private void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("course_list", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("My_changes", null);
+        Type type = new TypeToken<ArrayList<Course_data>>() {}.getType();
+        courses = gson.fromJson(json, type);
+
+        if(courses == null){
+            loadCourseData();
+        }
+    }
+
+    */
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //create an alert dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("Are you want to exit the app?");
+            builder.setPositiveButton("Yes", new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //exit the app
+                    finish();
+                }
+            })
+                    .setNegativeButton("No", new OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
     }
 
@@ -162,7 +208,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View view, int position) {
-        Course_card clickedItem = courses.get(position);
+        Course_data clickedItem = courses.get(position);
         Intent intent = new Intent(this,AttendanceActivity.class);
         //Log.d("tag", "id: "+ clickedItem.get_course_id());
         Bundle bund = new Bundle();
@@ -171,34 +217,6 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent,0);
     }
 
-    //modification
-
-   /*
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        getMenuInflater().inflate(R.menu.course_pop_up_menu,menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.updateid:
-                Toast.makeText(MainActivity.this,"update is selected",Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.backupid:
-                Toast.makeText(MainActivity.this,"backup is selected",Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.deleteid:
-                Toast.makeText(MainActivity.this,"delete is selected",Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-
-    }
-    //finish here
-    */
 
     @Override
     public void onLongClick(View view, final int position) {
@@ -219,7 +237,9 @@ public class MainActivity extends AppCompatActivity
                         Toast.makeText(MainActivity.this,"backup is selected ",Toast.LENGTH_SHORT).show();
                         return true;
                     case R.id.deleteid:
-                        Toast.makeText(MainActivity.this,"delete is selected ",Toast.LENGTH_SHORT).show();
+                        database_helper.deleteCourse(courses.get(position).get_course_id());
+                        finish();
+                        startActivity(getIntent());
                         return true;
                     default:
                         return false;

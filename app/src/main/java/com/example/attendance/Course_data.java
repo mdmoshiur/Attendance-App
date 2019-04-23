@@ -1,10 +1,10 @@
 package com.example.attendance;
 
-public class Course_card {
+public class Course_data {
     private String course_name, series_dept, roll;
     private String course_id;
 
-    public Course_card(String Course_id, String c_name, String ser_dept, String r) {
+    public Course_data(String Course_id, String c_name, String ser_dept, String r) {
         course_id = Course_id;
         course_name = c_name;
         series_dept = ser_dept;

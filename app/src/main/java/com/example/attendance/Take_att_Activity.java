@@ -147,7 +147,7 @@ public class Take_att_Activity extends AppCompatActivity {
         table_name = intent.getStringExtra("table_name");
         String col_name = intent.getStringExtra("new_col_name");
         col_name = col_name.replaceAll("/","_");
-        new_col_name = "day_"+col_name;
+        new_col_name = col_name;
         //Log.d("tag",table_name+" / "+ new_col_name);
 
     }

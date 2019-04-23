@@ -11,11 +11,11 @@ import java.util.ArrayList;
 
 public class Course_adapter extends RecyclerView.Adapter<Course_adapter.Course_view_holder>{
 
-    private ArrayList<Course_card> courses;
+    private ArrayList<Course_data> courses;
     //listener var
     private MyOnClickListener myOnClickListener;
 
-    public Course_adapter(ArrayList<Course_card> passing_courses){
+    public Course_adapter(ArrayList<Course_data> passing_courses){
         this.courses = passing_courses;
         //this.myOnClickListener = myOnClickListener;
     }
@@ -33,7 +33,7 @@ public class Course_adapter extends RecyclerView.Adapter<Course_adapter.Course_v
 
     @Override
     public void onBindViewHolder(@NonNull Course_view_holder course_view_holder, int i) {
-        Course_card current_course = courses.get(i);
+        Course_data current_course = courses.get(i);
 
         course_view_holder.course_name.setText(current_course.get_course_name());
         course_view_holder.series_dept.setText(current_course.get_series_dept());
