@@ -103,7 +103,7 @@ public class Database_helper extends SQLiteOpenHelper {
     }
 
 
-    public void create_attendance_table(String tble_name, int start, int end, String others){
+    public void create_attendance_table(String tble_name){
         //create table for new course attendance
          setTable_name(tble_name);
          String create_table_query ="CREATE TABLE "+ TABLE_NAME + "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -154,7 +154,7 @@ public class Database_helper extends SQLiteOpenHelper {
         }
 
     }
-    private static int  Row_id;
+    private static Integer  Row_id;
     private void setRow_id(String id){
         Row_id = Integer.parseInt(id);
     }
@@ -189,6 +189,16 @@ public class Database_helper extends SQLiteOpenHelper {
         String summary_query = "SELECT * FROM "+ TABLE_NAME;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(summary_query,null);
+        return cursor;
+    }
+
+    //show full attendance
+    public Cursor fullAttendance(String tble, String row_id) {
+        setTable_name(tble);
+        setRow_id(row_id);
+        String query_full = "SELECT * FROM "+ TABLE_NAME+ " Where id = "+ Row_id;
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery(query_full,null);
         return cursor;
     }
 

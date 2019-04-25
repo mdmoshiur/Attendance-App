@@ -55,7 +55,10 @@ public class AttendanceActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("tag", "item clicked "+ position);
+                Intent intent = new Intent(AttendanceActivity.this, Full_attendanceActivity.class);
+                intent.putExtra("table_name", TABLE_NAME);
+                intent.putExtra("row_id", dataUsers.get(position).getRowId());
+                startActivity(intent);
             }
         });
 

@@ -95,7 +95,7 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
                     String table_name = "attendance_table_"+row_id;
                     //Log.d("tag",table_name);
 
-                    database_helper.create_attendance_table(table_name, starting_roll, ending_roll, others);
+                    database_helper.create_attendance_table(table_name);
                     database_helper.insertRow(table_name, starting_roll, ending_roll, others);
 
                     //Toast.makeText(getApplicationContext(),"Row  is successfully inserted",Toast.LENGTH_SHORT).show();
