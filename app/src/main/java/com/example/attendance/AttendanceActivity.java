@@ -244,7 +244,11 @@ public class AttendanceActivity extends AppCompatActivity {
                 student_adapter.notifyDataSetChanged();
                 return true;
             case R.id.summary_id:
-
+                return true;
+            case R.id.create_table_id:
+                Intent intent = new Intent(AttendanceActivity.this, HtmlActivity.class);
+                intent.putExtra("table_name", TABLE_NAME);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

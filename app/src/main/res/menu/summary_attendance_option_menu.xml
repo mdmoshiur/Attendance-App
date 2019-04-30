@@ -30,4 +30,8 @@
         android:id="@+id/summary_id"
         android:title="Summary"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/create_table_id"
+        android:title="Show all as table"
+        app:showAsAction="never"/>
 </menu>

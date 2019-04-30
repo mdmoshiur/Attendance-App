@@ -263,4 +263,11 @@ public class Database_helper extends SQLiteOpenHelper {
         }
     }
 
+    public Cursor AllData(String tble) {
+        setTable_name(tble);
+        String query = "select * from "+ TABLE_NAME;
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        return sqLiteDatabase.rawQuery(query, null);
+    }
+
 }
