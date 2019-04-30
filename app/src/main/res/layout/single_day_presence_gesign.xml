@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1"
+    >
+
+    <LinearLayout
+        android:layout_weight="0.5"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/full_cycle_day_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="10D"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:padding="4dp"
+            android:textAlignment="center"
+            android:singleLine="true"
+            android:ellipsize="end"
+            />
+        <TextView
+            android:id="@+id/full_date_id"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="24/04/2019"
+            android:textStyle="italic"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:paddingBottom="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_weight="0.5"
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/full_presence_id"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Present"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:singleLine="true"
+            android:ellipsize="end"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

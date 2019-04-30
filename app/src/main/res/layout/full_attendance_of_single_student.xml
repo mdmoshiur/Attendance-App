@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginLeft="16dp"
+    android:layout_marginTop="16dp"
+    tools:context=".Full_attendanceActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/full_roll_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Roll No: 1503113"
+                android:textColor="#CE0808"
+                android:textStyle="bold"
+                android:textSize="32sp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+
+            <TextView
+                android:id="@+id/full_percentage_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Percentage : 85.67%"
+                android:textColor="#6408CE"
+                android:textStyle="italic"
+                android:textSize="24sp"
+                android:layout_below="@+id/full_roll_id"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="8dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+
+            <TextView
+                android:id="@+id/full_marks_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Obtained marks : 6"
+                android:textColor="#6408CE"
+                android:textStyle="italic"
+                android:textSize="24sp"
+                android:layout_below="@+id/full_percentage_id"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="4dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+
+            <TextView
+                android:id="@+id/full_present_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Present : 6"
+                android:textColor="#6408CE"
+                android:textStyle="italic"
+                android:textSize="24sp"
+                android:layout_below="@+id/full_marks_id"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="4dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+
+            <TextView
+                android:id="@+id/full_absent_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Absent : 2 "
+                android:textColor="#6408CE"
+                android:textStyle="italic"
+                android:textSize="24sp"
+                android:layout_below="@+id/full_present_id"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="4dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+
+            <LinearLayout
+                android:id="@+id/header_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/full_absent_id"
+                android:layout_marginTop="16dp"
+                android:weightSum="1"
+                >
+
+                <TextView
+                    android:id="@+id/full_fixed_day_id"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="Day"
+                    android:textSize="32sp"
+                    android:textStyle="italic"
+                    android:textAlignment="center"
+                    android:padding="4dp"
+                    android:textColor="#BF08E4"
+                    android:background="#C5CED1"
+                    />
+
+                <TextView
+                    android:layout_weight="0.4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="Presence"
+                    android:textSize="32sp"
+                    android:textStyle="italic"
+                    android:textAlignment="center"
+                    android:padding="4dp"
+                    android:textColor="#BF08E4"
+                    android:background="#C5CED1"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/header_id"
+                android:weightSum="1"
+                >
+
+                <com.example.attendance.NonScrollableListView
+                    android:layout_weight="0.9"
+                    android:id="@+id/full_list_view_id"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                </com.example.attendance.NonScrollableListView>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+
+</RelativeLayout>
