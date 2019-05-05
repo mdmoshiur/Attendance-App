@@ -1,17 +1,20 @@
 package com.example.attendance;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +24,26 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -30,10 +51,12 @@ import java.util.Comparator;
 import java.util.List;
 
 public class AttendanceActivity extends AppCompatActivity {
+    private static final int STORAGE_CODE = 100;
     private List<DataUser> dataUsers;
     private ListView listView;
     private FloatingActionButton floatingActionButton;
     private String TABLE_NAME;
+    private String Course_id;
     private Student_adapter student_adapter;
 
     private Database_helper database_helper = new Database_helper(this);
@@ -244,11 +267,16 @@ public class AttendanceActivity extends AppCompatActivity {
                 student_adapter.notifyDataSetChanged();
                 return true;
             case R.id.summary_id:
+                createAlertDialog();
                 return true;
             case R.id.create_table_id:
                 Intent intent = new Intent(AttendanceActivity.this, HtmlActivity.class);
                 intent.putExtra("table_name", TABLE_NAME);
                 startActivity(intent);
+                return true;
+            case R.id.export_id:
+                getPermission();
+                //createPDF();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -277,6 +305,7 @@ public class AttendanceActivity extends AppCompatActivity {
         String course_id = bundle.getString("Course_ID");
         table_name = table_name + course_id;
         TABLE_NAME = table_name;
+        Course_id = course_id;
         //Log.d("TAG", "table name: "+ table_name);
         dataUsers = new ArrayList<>(0);
         Cursor cursor = database_helper.AttendacneSummary(table_name);
@@ -306,6 +335,175 @@ public class AttendanceActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case STORAGE_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    //permission granted from popup
+                    createPDF();
+                } else {
+                    //permission denied
+                    Toast.makeText(this,"permission denied ...\nplease give permission to save pdf", Toast.LENGTH_LONG).show();
+                }
+        }
+    }
+
+    private void getPermission(){
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+                //request permission
+                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                requestPermissions(permissions, STORAGE_CODE);
+            } else {
+                //permission already granted
+                createPDF();
+            }
+        } else {
+            createPDF();
+        }
+
+
+    }
+
+    private void createPDF() {
+        Document document = new Document(PageSize.A4);
+        PdfPTable pdfPTable = new PdfPTable(4);
+        pdfPTable.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+        Cursor cursor = database_helper.AttendacneSummary(TABLE_NAME);
+        int total_class = cursor.getColumnCount()-5;
+        pdfPTable.addCell("Roll No.");
+        pdfPTable.addCell("Attendance (Out of "+total_class+")");
+        pdfPTable.addCell("% of Attendance");
+        pdfPTable.addCell("Obtained Marks (Out of 8)");
+        //for table header
+        pdfPTable.setHeaderRows(1);
+        PdfPCell[] cells = pdfPTable.getRow(0).getCells();
+        for(int i=0; i<cells.length; i++){
+            cells[i].setBackgroundColor(BaseColor.GRAY);
+        }
+
+        if(cursor != null){
+            while (cursor.moveToNext()){
+                String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
+                String attend = cursor.getString(cursor.getColumnIndex("attend"));
+                String p_att = cursor.getString(cursor.getColumnIndex("p_att"));
+                String marks = cursor.getString(cursor.getColumnIndex("marks"));
+                pdfPTable.addCell(roll);
+                pdfPTable.addCell(attend);
+                pdfPTable.addCell(p_att+"%");
+                pdfPTable.addCell(marks);
+            }
+        }
+        cursor.close();
+        try {
+            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/firstPDF.pdf");
+            if( !file.exists()){
+                file.createNewFile();
+            }
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+        } catch (DocumentException e) {
+            e.printStackTrace();
+            Log.d("exception", "ex:"+e);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.d("exception", "ex:"+e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("exception", "ex:"+e);
+        }
+        document.open();
+
+        //retrive data for heading
+
+        Cursor header = database_helper.showSingleCourse(Course_id);
+        while (header.moveToNext()){
+            String dept = header.getString(header.getColumnIndex("dept"));
+            String series = header.getString(header.getColumnIndex("series"));
+            String section = header.getString(header.getColumnIndex("section"));
+            String course_no = header.getString(header.getColumnIndex("course_name"));
+
+            Paragraph heaven = new Paragraph("Heaven's light is our guide\n", new Font(Font.FontFamily.HELVETICA,10,Font.ITALIC));
+            Paragraph university = new Paragraph("Rajshahi University of Engineering & Technology\n", new Font(Font.FontFamily.HELVETICA,12,Font.BOLD));
+            Paragraph course = new Paragraph("Course No.: "+ course_no+"\n", new Font(Font.FontFamily.TIMES_ROMAN,12, Font.NORMAL));
+            Paragraph series_dept = new Paragraph("Series: "+dept+"'"+ series+ " (Section: "+ section+")" +"\n\n", new Font(Font.FontFamily.TIMES_ROMAN,12, Font.ITALIC));
+            //set middle
+            heaven.setAlignment(Element.ALIGN_CENTER);
+            university.setAlignment(Element.ALIGN_CENTER);
+            course.setAlignment(Element.ALIGN_CENTER);
+            series_dept.setAlignment(Element.ALIGN_CENTER);
+            try {
+                document.add(heaven);
+                document.add(university);
+                document.add(course);
+                document.add(series_dept);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+        }
+        header.close();
+        try {
+            document.add(pdfPTable);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+            Log.d("exception", "ex:"+e);
+        }
+        document.close();
+        Toast.makeText(this, "pdf created", Toast.LENGTH_LONG).show();
+    }
+
+    private void createAlertDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(AttendanceActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.summary_layout, null);
+        TextView course_view = mView.findViewById(R.id.sum_course_id);
+        TextView series_view = mView.findViewById(R.id.sum_series_id);
+        TextView total_class_view = mView.findViewById(R.id.sum_total_class_id);
+        TextView average_view = mView.findViewById(R.id.sum_average_id);
+
+        //get data
+        Cursor course_info = database_helper.showSingleCourse(Course_id);
+        while (course_info.moveToNext()){
+            String dept = course_info.getString(course_info.getColumnIndex("dept"));
+            String series = course_info.getString(course_info.getColumnIndex("series"));
+            String section = course_info.getString(course_info.getColumnIndex("section"));
+            String course_no = course_info.getString(course_info.getColumnIndex("course_name"));
+            course_view.setText("Course No.: "+ course_no);
+            series_view.setText("Series: "+dept+"'"+series+" ( Section: "+ section+" )");
+        }
+        course_info.close();
+        Cursor class_info = database_helper.AttendacneSummary(TABLE_NAME);
+        Integer total_class = class_info.getColumnCount()-5;
+        Integer num_of_std = class_info.getCount();
+        total_class_view.setText("Total number of class: "+ total_class);
+        Integer sum = 0;
+        if (class_info != null){
+            while (class_info.moveToNext()){
+                Integer attend = Integer.parseInt(class_info.getString(class_info.getColumnIndex("attend")));
+                sum = sum + attend;
+            }
+        }
+        class_info.close();
+        double average = (sum * 100.0)/(total_class*num_of_std*1.0);
+        average_view.setText("Average % of Attendance: "+ round(average, 2)+"%");
+        builder.setView(mView);
+        builder.setPositiveButton("close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+    //for round
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
     //comparator
     public class MyComparetor implements Comparator<DataUser> {
         @Override
@@ -315,6 +513,5 @@ public class AttendanceActivity extends AppCompatActivity {
             return p1.compareTo(p2);
         }
     }
-
 
 }

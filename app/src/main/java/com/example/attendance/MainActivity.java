@@ -3,7 +3,6 @@ package com.example.attendance;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,10 +24,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -193,7 +188,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.addnewclassid) {
-            // Handle the camera action
+            startActivity(new Intent(MainActivity.this, new_course_activity.class));
         } else if (id == R.id.homeid) {
             startActivity(new Intent(MainActivity.this,MainActivity.class));
         } else if (id == R.id.uploadid) {
@@ -223,7 +218,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLongClick(View view, final int position) {
-        Log.d("tag","onlongClick is triggered ");
+        //Log.d("tag","onlongClick is triggered ");
 
         PopupMenu popupMenu = new PopupMenu(this,view);
         popupMenu.inflate(R.menu.course_pop_up_menu);

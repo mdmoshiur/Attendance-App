@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.attendance">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -10,17 +11,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HtmlActivity"></activity>
-        <activity android:name=".Full_attendanceActivity" />
+        <activity android:name="com.example.attendance.HtmlActivity"></activity>
+        <activity android:name="com.example.attendance.Full_attendanceActivity" />
         <activity
-            android:name=".AttendanceActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".Take_att_Activity" />
+            android:name="com.example.attendance.AttendanceActivity"
+            android:parentActivityName="com.example.attendance.MainActivity" />
+        <activity android:name="com.example.attendance.Take_att_Activity" />
         <activity
-            android:name=".new_course_activity"
-            android:parentActivityName=".MainActivity" />
+            android:name="com.example.attendance.new_course_activity"
+            android:parentActivityName="com.example.attendance.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.attendance.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

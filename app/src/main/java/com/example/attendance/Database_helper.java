@@ -2,8 +2,6 @@ package com.example.attendance;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -90,6 +88,11 @@ public class Database_helper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor showSingleCourse(String row_id){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        String single_course_query = "Select * from "+ table_name + " where course_id="+ row_id+";";
+        return sqLiteDatabase.rawQuery(single_course_query,null);
+    }
 
     //create table name
     private static String TABLE_NAME ="initial";
@@ -174,9 +177,11 @@ public class Database_helper extends SQLiteOpenHelper {
     public void deleteCourse(String id) {
         setRow_id(id);
         String delete_query = "Delete from "+ table_name +" where course_id = "+ Row_id+ " ;";
+        String drop_table_query = "drop table if exists attendance_table_"+ id;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try {
             sqLiteDatabase.execSQL(delete_query);
+            sqLiteDatabase.execSQL(drop_table_query);
         } catch (SQLException e) {
             e.printStackTrace();
         }

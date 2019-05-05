@@ -4,11 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +20,7 @@ public class Full_attendanceActivity extends AppCompatActivity {
     private String table_name, row_id;
     private Database_helper database_helper = new Database_helper(this);
     private Full_attendance_adapter full_attendance_adapter;
+    private String roll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +66,7 @@ public class Full_attendanceActivity extends AppCompatActivity {
         Integer number_of_column = cursor.getColumnCount();
         if (cursor != null) {
             while(cursor.moveToNext()){
-                String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
+                roll = cursor.getString(cursor.getColumnIndex("roll_no"));
                 String p_att =cursor.getString(cursor.getColumnIndex("p_att"));
                 String marks = cursor.getString(cursor.getColumnIndex("marks"));
                 String attend = cursor.getString(cursor.getColumnIndex("attend"));

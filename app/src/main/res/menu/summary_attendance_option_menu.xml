@@ -34,4 +34,8 @@
         android:id="@+id/create_table_id"
         android:title="Show all as table"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/export_id"
+        android:title="Export as pdf"
+        app:showAsAction="never"/>
 </menu>
