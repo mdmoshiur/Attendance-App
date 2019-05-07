@@ -221,6 +221,11 @@ public class AttendanceActivity extends AppCompatActivity {
                     }
                 });
                 return true;
+            case R.id.review_last_class_id:
+                Intent review_intent = new Intent(AttendanceActivity.this, ReviewLastClassAttendanceActivity.class);
+                review_intent.putExtra("table_name", TABLE_NAME);
+                startActivity(review_intent);
+                return true;
             case R.id.add_new_student_id:
                 AlertDialog.Builder builder = new AlertDialog.Builder(AttendanceActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.insert_roll_layout, null);
@@ -396,8 +401,24 @@ public class AttendanceActivity extends AppCompatActivity {
             }
         }
         cursor.close();
+        //construct file name
+        String file_name ="";
+        String course_no="";
+        String dept ="";
+        String series ="";
+        String section ="";
+        Cursor header = database_helper.showSingleCourse(Course_id);
+        while (header.moveToNext()){
+            dept = header.getString(header.getColumnIndex("dept"));
+            series = header.getString(header.getColumnIndex("series"));
+            section = header.getString(header.getColumnIndex("section"));
+            course_no = header.getString(header.getColumnIndex("course_name"));
+            file_name = course_no+" Series: "+dept+"'"+series+" ( Section : "+section+" ).pdf";
+            //file_name = file_name.replaceAll("\\s","");
+        }
+        header.close();
         try {
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/firstPDF.pdf");
+            File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+file_name);
             if( !file.exists()){
                 file.createNewFile();
             }
@@ -413,43 +434,27 @@ public class AttendanceActivity extends AppCompatActivity {
             Log.d("exception", "ex:"+e);
         }
         document.open();
-
-        //retrive data for heading
-
-        Cursor header = database_helper.showSingleCourse(Course_id);
-        while (header.moveToNext()){
-            String dept = header.getString(header.getColumnIndex("dept"));
-            String series = header.getString(header.getColumnIndex("series"));
-            String section = header.getString(header.getColumnIndex("section"));
-            String course_no = header.getString(header.getColumnIndex("course_name"));
-
-            Paragraph heaven = new Paragraph("Heaven's light is our guide\n", new Font(Font.FontFamily.HELVETICA,10,Font.ITALIC));
-            Paragraph university = new Paragraph("Rajshahi University of Engineering & Technology\n", new Font(Font.FontFamily.HELVETICA,12,Font.BOLD));
-            Paragraph course = new Paragraph("Course No.: "+ course_no+"\n", new Font(Font.FontFamily.TIMES_ROMAN,12, Font.NORMAL));
-            Paragraph series_dept = new Paragraph("Series: "+dept+"'"+ series+ " (Section: "+ section+")" +"\n\n", new Font(Font.FontFamily.TIMES_ROMAN,12, Font.ITALIC));
-            //set middle
-            heaven.setAlignment(Element.ALIGN_CENTER);
-            university.setAlignment(Element.ALIGN_CENTER);
-            course.setAlignment(Element.ALIGN_CENTER);
-            series_dept.setAlignment(Element.ALIGN_CENTER);
-            try {
-                document.add(heaven);
-                document.add(university);
-                document.add(course);
-                document.add(series_dept);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-        }
-        header.close();
+        //construct heading
+        Paragraph heaven = new Paragraph("Heaven's light is our guide\n", new Font(Font.FontFamily.HELVETICA,10,Font.ITALIC));
+        Paragraph university = new Paragraph("Rajshahi University of Engineering & Technology\n", new Font(Font.FontFamily.HELVETICA,12,Font.BOLD));
+        Paragraph course = new Paragraph("Course No.: "+ course_no+"\n", new Font(Font.FontFamily.TIMES_ROMAN,12, Font.NORMAL));
+        Paragraph series_dept = new Paragraph("Series: "+dept+"'"+ series+ " (Section: "+ section+")" +"\n\n", new Font(Font.FontFamily.TIMES_ROMAN,12, Font.ITALIC));
+        //set middle
+        heaven.setAlignment(Element.ALIGN_CENTER);
+        university.setAlignment(Element.ALIGN_CENTER);
+        course.setAlignment(Element.ALIGN_CENTER);
+        series_dept.setAlignment(Element.ALIGN_CENTER);
         try {
+            document.add(heaven);
+            document.add(university);
+            document.add(course);
+            document.add(series_dept);
             document.add(pdfPTable);
         } catch (DocumentException e) {
             e.printStackTrace();
-            Log.d("exception", "ex:"+e);
         }
         document.close();
-        Toast.makeText(this, "pdf created", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "pdf created in root folder", Toast.LENGTH_LONG).show();
     }
 
     private void createAlertDialog(){

@@ -50,7 +50,7 @@ public class Take_att_adapter extends ArrayAdapter<Take_att_data_node> {
 
         final Take_att_data_node current_node = getItem(position);
         viewHolder.roll.setText(current_node.getRoll());
-        viewHolder.p_att.setText(current_node.getPofa());
+        viewHolder.p_att.setText(current_node.getPofa()+"%");
         viewHolder.checkBox.setChecked(current_node.getCheckValue());
         viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

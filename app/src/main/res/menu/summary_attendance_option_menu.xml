@@ -8,6 +8,10 @@
         android:title="Search"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView" />
+    <item android:id="@+id/review_last_class_id"
+        android:title="Review last class attendance"
+        app:showAsAction="never"
+        />
     <item android:id="@+id/add_new_student_id"
         android:title="Add new student"
         app:showAsAction="never"

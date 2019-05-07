@@ -225,10 +225,11 @@ public class Database_helper extends SQLiteOpenHelper {
         setTable_name(tble_name);
         setColName(col_name);
         int sizeOfList = mylist.size();
-        String query_for_size = "select * from "+ TABLE_NAME;
+        Cursor cursor = AllData(tble_name);
+        Integer total_class = cursor.getColumnCount()-5;
+        cursor.close();
+        //Log.d("total class", "total class: " + total_class);
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        int total_class = sqLiteDatabase.rawQuery(query_for_size, null).getColumnCount()-5;
-        Log.d("tag", "total class: " + total_class);
         for(int i= 0; i< sizeOfList; i++){
             if(mylist.get(i).getIntegerCheckValue()== 1) {
                 try{
@@ -236,18 +237,47 @@ public class Database_helper extends SQLiteOpenHelper {
                             + " p_att = round(((attend+1)*1.0/"+total_class+")*100,2) "
                     +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
                 } catch (Exception e){
-                    Log.d("tag", "Exeception :"+ e);
+
                 }
             } else {
                 try{
                     sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " set p_att = round((attend*1.0/"+total_class+")*100,2) "
                             +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
                 } catch (Exception e){
-                    Log.d("tag", "Exeception :"+ e);
+
                 }
             }
         }
         UpdateMarks();
+    }
+
+    public void updateLastAttendance(String tble, List<Take_att_data_node> updatedList, List<Take_att_data_node> previousList){
+        setTable_name(tble);
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        int size = previousList.size();
+        Cursor cursor = AllData(tble);
+        Integer total_class = cursor.getColumnCount()-5;
+        String col_name = cursor.getColumnName(cursor.getColumnCount()-1);
+        setColName(col_name);
+        cursor.close();
+        for( int i=0;i<size;i++){
+            if (updatedList.get(i).getIntegerCheckValue() != previousList.get(i).getIntegerCheckValue()){
+                if(updatedList.get(i).getIntegerCheckValue()==1){
+                    try{
+                        sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 1 , attend = attend + 1, "
+                                + " p_att = round(((attend+1)*1.0/"+total_class+")*100,2) "
+                                +" WHERE roll_no = "+ updatedList.get(i).getRoll() + ";");
+                    } catch (Exception e){ }
+                } else {
+                    try{
+                        sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 0 , attend = attend - 1, "
+                                + " p_att = round(((attend - 1)*1.0/"+total_class+")*100,2) "
+                                +" WHERE roll_no = "+ updatedList.get(i).getRoll() + ";");
+                    } catch (Exception e){ }
+                }
+                updateMarksRollwise(updatedList.get(i).getRoll());
+            }
+        }
     }
 
     public void UpdateMarks(){
@@ -264,15 +294,36 @@ public class Database_helper extends SQLiteOpenHelper {
                     +" where 1"
                     + ";");
         } catch (Exception e){
-            Log.d("tag", "Exeception :"+ e);
+           //Log.d("tag", "Exeception :"+ e);
+        }
+
+    }
+
+    public void updateMarksRollwise(String roll_string){
+        Integer roll = Integer.parseInt(roll_string);
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        try{
+            sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " set marks = case "
+                    +" when p_att >= 90.0 then 8 "
+                    +" when p_att >= 85.0 then 7 "
+                    +" when p_att >= 80.0 then 6 "
+                    +" when p_att >= 70.0 then 5 "
+                    +" when p_att >= 60.0 then 4 "
+                    +" when p_att < 60.0 then 0 "
+                    +" end "
+                    +" where roll_no = "+ roll
+                    + " ;");
+        } catch (Exception e){
+            //Log.d("tag", "Exeception :"+ e);
         }
     }
 
     public Cursor AllData(String tble) {
         setTable_name(tble);
         String query = "select * from "+ TABLE_NAME;
-        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         return sqLiteDatabase.rawQuery(query, null);
     }
+
 
 }

@@ -62,6 +62,7 @@ public class Take_att_Activity extends AppCompatActivity {
                 take_att_adapter.notifyDataSetChanged();
                 return true;
             case R.id.save_id:
+                button.performClick();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -112,7 +113,7 @@ public class Take_att_Activity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(Take_att_Activity.this, "Toaday's attendance is stored.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Take_att_Activity.this, "Today's  attendance is stored.", Toast.LENGTH_SHORT).show();
                         database_helper.AddColumn(table_name, new_col_name);
                         database_helper.InsertTodaysAtt(table_name, new_col_name, list);
                         //finish();
@@ -151,7 +152,7 @@ public class Take_att_Activity extends AppCompatActivity {
     }
 
     private void InitializeUI() {
-        listView = findViewById(R.id.listview_for_take_att_id);
+         listView = findViewById(R.id.listview_for_take_att_id);
         button = findViewById(R.id.save_button_id);
     }
 
@@ -161,7 +162,7 @@ public class Take_att_Activity extends AppCompatActivity {
             while (cursor.moveToNext()) {
                 String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
                 String p_att = cursor.getString(cursor.getColumnIndex("p_att"));
-                list.add(new Take_att_data_node(roll, p_att+"%",0));
+                list.add(new Take_att_data_node(roll, p_att,0));
             }
         }
     }

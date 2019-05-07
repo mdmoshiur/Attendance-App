@@ -108,6 +108,7 @@
             android:layout_height="wrap_content"
             android:hint="Others Roll"
             android:inputType="text"
+            android:digits="0123456789,"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>
 
