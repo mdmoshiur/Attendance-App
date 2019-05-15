@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#E42C9B">
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_sign_in_button_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="visible"
+        android:layout_margin="64dp"
+        >
+    </com.google.android.gms.common.SignInButton>
+
+    <Button
+        android:id="@+id/sign_out_button_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:text="Sign Out"
+        android:textAllCaps="false"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_marginTop="64dp"
+        />
+    <Button
+        android:id="@+id/sign_in_other_account_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign in other account"
+        android:background="#FFFFFF"
+        android:textAllCaps="false"
+        android:layout_marginTop="8dp"
+        android:layout_below="@+id/sign_out_button_id"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_marginBottom="64dp"
+        />
+
+</RelativeLayout>

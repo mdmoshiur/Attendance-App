@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.util.List;
 
 public class Database_helper extends SQLiteOpenHelper {
-    private static final String db_name = "attendance.db";
+    protected static final String db_name = "attendance.db";
     private static final String table_name = "courses";
     private static final String series = "series";
     private static final String dept = "dept";
@@ -49,7 +49,7 @@ public class Database_helper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            Toast.makeText(context,"onCreate method is called",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context,"onCreate method is called",Toast.LENGTH_SHORT).show();
             db.execSQL(create_table);
         } catch (Exception e) {
             Toast.makeText(context,"Exception in onCreate method",Toast.LENGTH_SHORT).show();
@@ -59,7 +59,7 @@ public class Database_helper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try{
-            Toast.makeText(context,"onUpgrade is called",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context,"onUpgrade is called",Toast.LENGTH_SHORT).show();
             db.execSQL(drop_tabe);
             onCreate(db);
         } catch (Exception e){

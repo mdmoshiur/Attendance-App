@@ -32,6 +32,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     //for circular image
     implementation 'de.hdodenhof:circleimageview:3.0.0'
+    implementation 'com.mikhaellopez:circularimageview:3.2.0'
     //for gson
     implementation 'com.google.code.gson:gson:2.8.5'
     //for itext html to pdf
@@ -39,4 +40,13 @@ dependencies {
 
     //for htmltextView
     implementation 'org.sufficientlysecure:html-textview:3.6'
+
+    //for google sign in
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
+    //for google drive api
+    implementation 'com.google.android.gms:play-services-drive:15.0.1'
+
+    //for glide image
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
 }

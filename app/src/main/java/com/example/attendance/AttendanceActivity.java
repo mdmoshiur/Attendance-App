@@ -418,7 +418,11 @@ public class AttendanceActivity extends AppCompatActivity {
         }
         header.close();
         try {
-            File file = new File(Environment.getExternalStorageDirectory().getPath() +"/"+file_name);
+            File folder = new File(Environment.getExternalStorageDirectory() + File.separator + "AttendanceApp");
+            if(!folder.exists()){
+                folder.mkdirs();
+            }
+            File file = new File(Environment.getExternalStorageDirectory().getPath() +"/AttendanceApp/"+file_name);
             if( !file.exists()){
                 file.createNewFile();
             }

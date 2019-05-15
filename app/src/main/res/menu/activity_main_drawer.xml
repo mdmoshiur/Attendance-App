@@ -15,7 +15,11 @@
         <item
             android:id="@+id/uploadid"
             android:icon="@drawable/ic_cloud_upload_black_24dp"
-            android:title="Upload" />
+            android:title="Upload DB in Drive" />
+        <item
+            android:id="@+id/restore_id"
+            android:icon="@drawable/ic_cloud_download"
+            android:title="Restore DB from Drive" />
 
     </group>
 
