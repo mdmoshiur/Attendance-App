@@ -32,11 +32,11 @@
     </item>
     <item
         android:id="@+id/summary_id"
-        android:title="Summary"
+        android:title="Summary of this class"
         app:showAsAction="never"/>
     <item
         android:id="@+id/create_table_id"
-        android:title="Show all as table"
+        android:title="Full attendance sheet"
         app:showAsAction="never"/>
     <item
         android:id="@+id/export_id"

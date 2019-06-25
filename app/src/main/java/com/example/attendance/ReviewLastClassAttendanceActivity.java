@@ -21,7 +21,7 @@ import java.util.List;
 public class ReviewLastClassAttendanceActivity extends AppCompatActivity {
     private String table_name;
     private String new_col_name;
-    private ListView listView;
+    private NonScrollableListView listView;
     private Button updateButton;
     private List<Take_att_data_node> reviewList = new ArrayList<>(0);
     private List<Take_att_data_node> previousList = new ArrayList<>(0);
@@ -132,7 +132,7 @@ public class ReviewLastClassAttendanceActivity extends AppCompatActivity {
                 String p_att = cursor.getString((cursor.getColumnIndex("p_att")));
                 String presence = cursor.getString(lastColumnIndex);
                 Integer checkBoxValue;
-                if(presence.equals("0")){
+                if(presence.equals("A")){
                     checkBoxValue = 0;
                 } else {
                     checkBoxValue = 1;

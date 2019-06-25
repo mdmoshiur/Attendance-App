@@ -1,5 +1,8 @@
 package com.example.attendance;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -69,6 +72,8 @@ import static com.example.attendance.Database_helper.db_name;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Course_adapter.MyOnClickListener {
     private static final String TAG = "MainActivity";
+    public static final int jobID = 112821;
+    public static MainActivity mainActivity;
     //modification start here
     ArrayList<Course_data> courses = new ArrayList<>();
     //variables for courses
@@ -91,6 +96,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mainActivity = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -319,10 +325,12 @@ public class MainActivity extends AppCompatActivity
                 .setMimeType("application/db")
                 .build();
 
+
         CreateFileActivityOptions createFileActivityOptions = new CreateFileActivityOptions.Builder()
                 .setInitialMetadata(metadataChangeSet)
                 .setInitialDriveContents(driveContents)
                 .build();
+
 
         return mDriveClient.newCreateFileActivityIntentSender(createFileActivityOptions)
                 .continueWith(new Continuation<IntentSender, Void>() {
@@ -563,14 +571,37 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.restore_id){
             connectToDrive(false);
         } else if (id == R.id.contactid) {
+            scheduleJob();
 
         } else if (id == R.id.shareid) {
-
+            cancelJob();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void scheduleJob(){
+        ComponentName componentName  = new ComponentName(MainActivity.this, DatabaseUploadJobService.class);
+        JobInfo jobInfo = new JobInfo.Builder(jobID, componentName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+                .setPeriodic(12*60*60*1000)
+                .build();
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        int resultCode = jobScheduler.schedule(jobInfo);
+        if(resultCode == JobScheduler.RESULT_SUCCESS){
+            Log.d("jobservice","Job scheduled finished");
+        } else {
+            Log.d("jobservice","Job scheduling failed");
+        }
+    }
+
+    public void cancelJob(){
+        JobScheduler jobScheduler =(JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        jobScheduler.cancel(jobID);
+        Log.d("jobservice","Job cancelled");
     }
 
     @Override
@@ -599,9 +630,6 @@ public class MainActivity extends AppCompatActivity
                 switch (item.getItemId()){
                     case R.id.updateid:
                         Toast.makeText(MainActivity.this,"update is selected "+ position,Toast.LENGTH_SHORT).show();
-                        return true;
-                    case R.id.backupid:
-                        Toast.makeText(MainActivity.this,"backup is selected ",Toast.LENGTH_SHORT).show();
                         return true;
                     case R.id.deleteid:
                         database_helper.deleteCourse(courses.get(position).get_course_id());

@@ -113,6 +113,7 @@ public class Database_helper extends SQLiteOpenHelper {
                 + "roll_no INTEGER, "
                 + "p_att INTEGER DEFAULT 0, "
                  + "marks INTEGER DEFAULT 0, "
+                 + "total_class INTEGER Default 0, "
                  +"attend INTEGER DEFAULT 0  "
                  + ");";
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -211,10 +212,13 @@ public class Database_helper extends SQLiteOpenHelper {
     public void AddColumn(String tble_name, String col_name){
         setTable_name(tble_name);
         setColName(col_name);
-        String alter_table_query = "ALTER TABLE "+ TABLE_NAME + " ADD COLUMN "+ COL_NAME+ " INTEGER DEFAULT 0;";
+        String alter_table_query = "ALTER TABLE "+ TABLE_NAME + " ADD COLUMN "+ COL_NAME+ " TEXT DEFAULT 'A' ;";
+        //update total class
+        String update_total_class_query = "update "+ TABLE_NAME + " set total_class = total_class + 1 where  1;";
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         try {
             sqLiteDatabase.execSQL(alter_table_query);
+            sqLiteDatabase.execSQL(update_total_class_query);
         } catch (Exception e){
             Log.d("tag", "Exception: "+e);
         }
@@ -225,23 +229,23 @@ public class Database_helper extends SQLiteOpenHelper {
         setTable_name(tble_name);
         setColName(col_name);
         int sizeOfList = mylist.size();
-        Cursor cursor = AllData(tble_name);
-        Integer total_class = cursor.getColumnCount()-5;
-        cursor.close();
+        //Cursor cursor = AllData(tble_name);
+        //Integer total_class = cursor.getColumnCount()-5;
+        //cursor.close();
         //Log.d("total class", "total class: " + total_class);
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         for(int i= 0; i< sizeOfList; i++){
             if(mylist.get(i).getIntegerCheckValue()== 1) {
                 try{
-                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 1 , attend = attend + 1, "
-                            + " p_att = round(((attend+1)*1.0/"+total_class+")*100,2) "
+                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 'P' , attend = attend + 1, "
+                            + " p_att = round(((attend+1)*1.0/total_class)*100,2) "
                     +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
                 } catch (Exception e){
 
                 }
             } else {
                 try{
-                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " set p_att = round((attend*1.0/"+total_class+")*100,2) "
+                    sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " set p_att = round((attend*1.0/total_class)*100,2) "
                             +" WHERE roll_no = "+ mylist.get(i).getRoll() + ";");
                 } catch (Exception e){
 
@@ -256,7 +260,7 @@ public class Database_helper extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         int size = previousList.size();
         Cursor cursor = AllData(tble);
-        Integer total_class = cursor.getColumnCount()-5;
+        //Integer total_class = cursor.getColumnCount()-5;
         String col_name = cursor.getColumnName(cursor.getColumnCount()-1);
         setColName(col_name);
         cursor.close();
@@ -264,20 +268,44 @@ public class Database_helper extends SQLiteOpenHelper {
             if (updatedList.get(i).getIntegerCheckValue() != previousList.get(i).getIntegerCheckValue()){
                 if(updatedList.get(i).getIntegerCheckValue()==1){
                     try{
-                        sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 1 , attend = attend + 1, "
-                                + " p_att = round(((attend+1)*1.0/"+total_class+")*100,2) "
+                        sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 'P' , attend = attend + 1, "
+                                + " p_att = round(((attend+1)*1.0/total_class)*100,2) "
                                 +" WHERE roll_no = "+ updatedList.get(i).getRoll() + ";");
                     } catch (Exception e){ }
                 } else {
                     try{
-                        sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 0 , attend = attend - 1, "
-                                + " p_att = round(((attend - 1)*1.0/"+total_class+")*100,2) "
+                        sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 'A' , attend = attend - 1, "
+                                + " p_att = round(((attend - 1)*1.0/total_class)*100,2) "
                                 +" WHERE roll_no = "+ updatedList.get(i).getRoll() + ";");
                     } catch (Exception e){ }
                 }
                 updateMarksRollwise(updatedList.get(i).getRoll());
             }
         }
+    }
+
+    public void toggleAttendance(String tabl, String roll, String col, String presence){
+        setTable_name(tabl);
+        setColName(col);
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        if(presence.equals("P")){
+            try {
+                sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 'P' , attend = attend + 1, "
+                        + " p_att = round(((attend+1)*1.0/total_class)*100,2) "
+                        +" WHERE roll_no = " + roll+ " ;");
+            } catch (Exception e){
+
+            }
+        } else {
+            try{
+                sqLiteDatabase.execSQL("UPDATE "+ TABLE_NAME + " SET "+COL_NAME+ " = 'A' , attend = attend - 1, "
+                        + " p_att = round(((attend - 1)*1.0/total_class)*100,2) "
+                        +" WHERE roll_no = "+ roll + " ;");
+            } catch (Exception e){ }
+        }
+
+        //update marks
+        updateMarksRollwise(roll);
     }
 
     public void UpdateMarks(){

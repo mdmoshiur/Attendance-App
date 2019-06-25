@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,6 +21,8 @@ public class HtmlActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_html);
+        getSupportActionBar().setTitle("Full Att. Sheet");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         table_name = intent.getStringExtra("table_name");
@@ -33,6 +37,19 @@ public class HtmlActivity extends AppCompatActivity {
        // webView.getSettings().setUseWideViewPort(true);
         createTable();
         webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
 
     }
@@ -62,7 +79,7 @@ public class HtmlActivity extends AppCompatActivity {
         Cursor cursor = database_helper.AllData(table_name);
         stringBuilder.append("<tr><th>Roll No</th>");
         Integer col = cursor.getColumnCount();
-        for(int i=5; i < col; i++) {
+        for(int i=6; i < col; i++) {
             String col_name = cursor.getColumnName(i);
             String cycle = col_name.substring(col_name.indexOf("cycle_") + 6, col_name.indexOf("_day"));
             String day = col_name.substring(col_name.indexOf("day_") + 4, col_name.indexOf("_date"));
@@ -76,10 +93,15 @@ public class HtmlActivity extends AppCompatActivity {
         Integer row = cursor.getCount();
         while (cursor.moveToNext()){
             String roll = cursor.getString(1);
+            Integer total_class = Integer.parseInt(cursor.getString(cursor.getColumnIndex("total_class")));
             stringBuilder.append("<tr><td>"+roll+"</td>");
-            for(int j=5; j<col; j++){
-                String presence = cursor.getString(j);
-                stringBuilder.append("<td>"+presence+"</td>");
+            for(int j=6 ; j<col; j++){
+                if((col - total_class) > j){
+                    stringBuilder.append("<td>"+""+"</td>");
+                } else {
+                    String presence = cursor.getString(j);
+                    stringBuilder.append("<td>"+presence+"</td>");
+                }
             }
             String percentage = cursor.getString(cursor.getColumnIndex("p_att"));
             String marks = cursor.getString(cursor.getColumnIndex("marks"));

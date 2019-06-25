@@ -57,6 +57,7 @@ public class AttendanceActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
     private String TABLE_NAME;
     private String Course_id;
+    private String actionBatTitle;
     private Student_adapter student_adapter;
 
     private Database_helper database_helper = new Database_helper(this);
@@ -70,7 +71,7 @@ public class AttendanceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
-        getSupportActionBar().setTitle("Summary Attendance");
+        //getSupportActionBar().setTitle(actionBatTitle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         Initialize();
@@ -311,6 +312,16 @@ public class AttendanceActivity extends AppCompatActivity {
         table_name = table_name + course_id;
         TABLE_NAME = table_name;
         Course_id = course_id;
+        //recover data for title bar
+        Cursor course = database_helper.showSingleCourse(course_id);
+        course.moveToNext();
+        String courseNo = course.getString(course.getColumnIndex("course_name"));
+        String series = course.getString(course.getColumnIndex("series"));
+        String section = course.getString(course.getColumnIndex("section"));
+        String dept = course.getString(course.getColumnIndex("dept"));
+        course.close();
+        actionBatTitle = courseNo+" ("+dept+" "+series+"'"+section+")";
+        getSupportActionBar().setTitle(actionBatTitle);
         //Log.d("TAG", "table name: "+ table_name);
         dataUsers = new ArrayList<>(0);
         Cursor cursor = database_helper.AttendacneSummary(table_name);
@@ -321,20 +332,19 @@ public class AttendanceActivity extends AppCompatActivity {
                 String roll = cursor.getString(cursor.getColumnIndex("roll_no"));
                 String p_att =cursor.getString(cursor.getColumnIndex("p_att"));
                 String marks = cursor.getString(cursor.getColumnIndex("marks"));
+                String Total_class = cursor.getString(cursor.getColumnIndex("total_class"));
+                Integer total_class = Integer.parseInt(Total_class);
                 StringBuilder recent = new StringBuilder();
                 recent.append("R: ");
-                for(int i = latest_col; i>4 && latest_col-i <= 7; i--){
-                    if(cursor.getString(i).equals("1")){
-                        recent.append("P");
-                    }
-                    else
-                        recent.append("A");
+                for(int i = latest_col;(latest_col -i ) < total_class && latest_col-i <= 7; i--){
+                    recent.append(cursor.getString(i));
                 }
                 String r = recent.toString();
                 //add to list item
                 dataUsers.add(new DataUser(row_id, roll, marks, p_att, r));
             }
         }
+        cursor.close();
         student_adapter = new Student_adapter(this, R.layout.single_student_designview, dataUsers);
         listView.setAdapter(student_adapter);
 
@@ -376,7 +386,7 @@ public class AttendanceActivity extends AppCompatActivity {
         PdfPTable pdfPTable = new PdfPTable(4);
         pdfPTable.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
         Cursor cursor = database_helper.AttendacneSummary(TABLE_NAME);
-        int total_class = cursor.getColumnCount()-5;
+        int total_class = cursor.getColumnCount()-6;
         pdfPTable.addCell("Roll No.");
         pdfPTable.addCell("Attendance (Out of "+total_class+")");
         pdfPTable.addCell("% of Attendance");
@@ -458,7 +468,7 @@ public class AttendanceActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         document.close();
-        Toast.makeText(this, "pdf created in root folder", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "pdf created in AttendanceApp folder", Toast.LENGTH_LONG).show();
     }
 
     private void createAlertDialog(){
@@ -481,7 +491,7 @@ public class AttendanceActivity extends AppCompatActivity {
         }
         course_info.close();
         Cursor class_info = database_helper.AttendacneSummary(TABLE_NAME);
-        Integer total_class = class_info.getColumnCount()-5;
+        Integer total_class = class_info.getColumnCount()-6;
         Integer num_of_std = class_info.getCount();
         total_class_view.setText("Total number of class: "+ total_class);
         Integer sum = 0;

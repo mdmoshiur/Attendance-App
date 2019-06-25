@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Take_att_Activity"
-    android:orientation="vertical"
-    android:weightSum="1"
     >
-
-    <LinearLayout
-        android:layout_weight=".95"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp">
-        <ListView
-            android:id="@+id/listview_for_take_att_id"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="0dp"
-            >
+            android:layout_height="match_parent">
 
-        </ListView>
-    </LinearLayout>
+            <com.example.attendance.NonScrollableListView
+                android:id="@+id/listview_for_take_att_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                >
 
-    <LinearLayout
-        android:layout_weight=".05"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-        <Button
-            android:id="@+id/save_button_id"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/gradient_design"
-            android:text="Save"
-            />
-    </LinearLayout>
+            </com.example.attendance.NonScrollableListView>
 
-</LinearLayout>
+            <Button
+                android:id="@+id/save_button_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gradient_design"
+                android:text="Save attendance"
+                android:layout_below="@+id/listview_for_take_att_id"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

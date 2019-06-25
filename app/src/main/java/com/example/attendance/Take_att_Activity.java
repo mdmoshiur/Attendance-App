@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Take_att_Activity extends AppCompatActivity {
-    private ListView listView;
+    private NonScrollableListView listView;
     private Take_att_adapter take_att_adapter;
     private Button button;
     List<Take_att_data_node> list = new ArrayList<>(0);
@@ -109,7 +109,7 @@ public class Take_att_Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(Take_att_Activity.this);
-                builder.setMessage("Are you want to save this?");
+                builder.setTitle("Are you want to save this?");
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
