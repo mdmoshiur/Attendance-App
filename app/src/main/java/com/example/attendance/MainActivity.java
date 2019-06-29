@@ -59,7 +59,9 @@ import com.google.gson.Gson;
 
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 //import database name form db helper class
@@ -331,9 +333,11 @@ public class MainActivity extends AppCompatActivity
             if (account == null){
                 Toast.makeText(MainActivity.this, "please sign in first...",Toast.LENGTH_LONG).show();
             } else {
+                String timeStamp = new SimpleDateFormat("dd_MM_yyyy").format(Calendar.getInstance().getTime());
+                String dbOldFileName = "Attendance_oldFile_date_" +timeStamp+".db";
                 setDriveServiceHelper();
                 if(mDriveServiceHelper != null){
-                    mDriveServiceHelper.downloadDBFile(new File(MainActivity.this.getDatabasePath(db_name).toString()))
+                    mDriveServiceHelper.downloadDBFile(getDBFile(), dbOldFileName, new File(MainActivity.this.getDatabasePath(db_name).toString()))
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -543,8 +547,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.restore_id){
             createConfirmDialog();
         } else if (id == R.id.contactid) {
-            //scheduleJob();
-
+           
         } else if (id == R.id.shareid) {
             //cancelJob();
         }

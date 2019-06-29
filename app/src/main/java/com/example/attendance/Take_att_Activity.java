@@ -14,7 +14,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.example.attendance.MainActivity.mainActivity;
@@ -149,7 +151,8 @@ public class Take_att_Activity extends AppCompatActivity {
         table_name = intent.getStringExtra("table_name");
         String col_name = intent.getStringExtra("new_col_name");
         col_name = col_name.replaceAll("/","_");
-        new_col_name = col_name;
+        String timeStamp = new SimpleDateFormat("dd_MM_yyyy_HHmmss").format(Calendar.getInstance().getTime());
+        new_col_name = col_name + "_timeStamp_" +timeStamp;
         //Log.d("tag",table_name+" / "+ new_col_name);
 
     }

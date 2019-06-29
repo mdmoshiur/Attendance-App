@@ -145,7 +145,7 @@ public class Full_attendanceActivity extends AppCompatActivity {
                     String col_name = cursor.getColumnName(i);
                     String cycle = col_name.substring(col_name.indexOf("cycle_")+6, col_name.indexOf("_day"));
                     String day = col_name.substring(col_name.indexOf("day_")+4, col_name.indexOf("_date"));
-                    String date = col_name.substring(col_name.indexOf("date_")+5);
+                    String date = col_name.substring(col_name.indexOf("date_")+5, col_name.indexOf("_timeStamp"));
                     String cycle_day = cycle + day;
                     //second period check
                     if (col_name.startsWith("second_")){

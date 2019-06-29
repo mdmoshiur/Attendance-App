@@ -104,10 +104,25 @@ public class DriveServiceHelper {
     }
 
     //restore database file
-    public Task<Void> downloadDBFile(final java.io.File saveFileLocation){
+    public Task<Void> downloadDBFile(final java.io.File dbFile, final String fileName, final java.io.File saveFileLocation){
         return Tasks.call(mExecutor, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
+
+                //upload old database file
+                File metadata = new File()
+                        .setParents(Collections.singletonList("root"))
+                        .setMimeType("application/db")
+                        .setName(fileName);
+
+                FileContent fileContent = new FileContent("application/db", dbFile);
+                File googleFile = mDriveService.files().create(metadata, fileContent).execute();
+                if (googleFile == null) {
+                    throw new IOException("Null result when uploading file :(");
+                } else {
+                    Log.d(TAG,"file not uploaded");
+                }
+
                 //search for file
                 FileList result = mDriveService.files().list()
                         .setQ("name = 'AttendanceApp.db' and mimeType = 'application/db' and trashed = false")
