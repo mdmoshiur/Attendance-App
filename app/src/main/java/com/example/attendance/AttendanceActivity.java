@@ -50,11 +50,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.example.attendance.MainActivity.mainActivity;
+
 public class AttendanceActivity extends AppCompatActivity {
     private static final int STORAGE_CODE = 100;
     private List<DataUser> dataUsers;
     private ListView listView;
     private FloatingActionButton floatingActionButton;
+
     private String TABLE_NAME;
     private String Course_id;
     private String actionBatTitle;
@@ -106,6 +109,7 @@ public class AttendanceActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int which) {
                                         String id = dataUsers.get(position).getRowId().trim();
                                         database_helper.deleteRow(TABLE_NAME,id);
+                                        //mainActivity.scheduleJob();
                                         finish();
                                         startActivity(getIntent());
                                     }
@@ -243,6 +247,7 @@ public class AttendanceActivity extends AppCompatActivity {
                         if(roll.getText()!= null){
                             String rolls = roll.getText().toString().trim();
                             database_helper.AddStudent(TABLE_NAME, rolls);
+                            mainActivity.scheduleJob();
                             //student_adapter.notifyDataSetChanged();
                             dialog.dismiss();
                             finish();

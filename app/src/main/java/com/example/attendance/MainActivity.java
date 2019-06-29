@@ -1,5 +1,6 @@
 package com.example.attendance;
 
+import android.app.Activity;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -12,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -41,28 +43,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.drive.CreateFileActivityOptions;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.drive.DriveContents;
-import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.DriveResourceClient;
-import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.drive.OpenFileActivityOptions;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.SearchableField;
-import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.common.api.Scope;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+import com.google.gson.Gson;
+
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -71,7 +67,7 @@ import static com.example.attendance.Database_helper.db_name;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Course_adapter.MyOnClickListener {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity.this";
     public static final int jobID = 112821;
     public static MainActivity mainActivity;
     //modification start here
@@ -86,11 +82,10 @@ public class MainActivity extends AppCompatActivity
 
     //for google sign in and drive api
     private static final int RC_SIGN_IN = 0;
-    private static final int RC_CREATION = 1;
-    private static final int RC_OPENING = 2;
-    private DriveClient mDriveClient;
-    private DriveResourceClient mDriveResourceClient;
-    private TaskCompletionSource<DriveId> mOpenItemTaskSource;
+
+    //for rest api
+    private DriveServiceHelper mDriveServiceHelper;
+    private String mFileId = null;
     //database helper class object
     private Database_helper database_helper;
 
@@ -177,11 +172,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(MainActivity.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null;
-    }
-
     private boolean isInternetAvailable(){
         try {
             String command = "ping -c 1 google.com";
@@ -246,32 +236,126 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(GoogleSignInClient.getSignInIntent(), RC_SIGN_IN);
     }
 
+    private GoogleSignInClient buildGoogleSignInClient() {
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
+                        .build();
+        return GoogleSignIn.getClient(this, signInOptions);
+    }
+
+
+    //recover drive service helper account
+    private void setDriveServiceHelper(){
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+        if(googleSignInAccount != null){
+            // Use the authenticated account to sign in to the Drive service.
+            GoogleAccountCredential credential =
+                    GoogleAccountCredential.usingOAuth2(
+                            MainActivity.this, Collections.singleton(DriveScopes.DRIVE_FILE));
+            credential.setSelectedAccount(googleSignInAccount.getAccount());
+            Drive googleDriveService =
+                    new Drive.Builder(
+                            AndroidHttp.newCompatibleTransport(),
+                            new GsonFactory(),
+                            credential)
+                            .setApplicationName("Attendance App")
+                            .build();
+
+            // The DriveServiceHelper encapsulates all REST API and SAF functionality.
+            // Its instantiation is required before handling any onClick actions.
+            mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+        }
+    }
+
     //drive backup
-    public void connectToDrive(Boolean backup){
+    public void backupDB(){
         if (! isInternetAvailable()){
-            Toast.makeText(MainActivity.this, "No internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "No internet available", Toast.LENGTH_SHORT).show();
         }
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
         if (account == null){
             Toast.makeText(MainActivity.this, "please sign in first...",Toast.LENGTH_LONG).show();
         } else {
-            mDriveClient = Drive.getDriveClient(MainActivity.this, account);
-            mDriveResourceClient = Drive.getDriveResourceClient(MainActivity.this, account);
-            if (backup){
-                startDriveBackup();
+            setDriveServiceHelper();
+            Log.d(TAG, "mDriveservice helper i am here now: "+mDriveServiceHelper);
+            if (mDriveServiceHelper != null){
+                //Log.d(TAG, "mDriveservice helper:"+mDriveServiceHelper);
+                File dbFile = getDBFile();
+                mDriveServiceHelper.uploadDBfile(dbFile)
+                        .addOnSuccessListener(new OnSuccessListener<String>() {
+                            @Override
+                            public void onSuccess(String fileId) {
+                                //mFileId = fileId;
+                                Toast.makeText(MainActivity.this, "Database uploaded successfully :)",Toast.LENGTH_SHORT).show();
+                                //Log.d(TAG, "database file successfully uploaded fileId : "+fileId);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, " failed to upload database file!");
+                            }
+                        });
+            }
+
+        }
+    }
+
+    private File getDBFile(){
+        final String dbFilePath = MainActivity.this.getDatabasePath(db_name).toString();
+        File dbFile = new File(dbFilePath);
+        return dbFile;
+    }
+    /*
+    //filepicker
+    private void openFilePicker(){
+        if (mDriveServiceHelper != null) {
+            Log.d(TAG, "Opening file picker.");
+
+            Intent pickerIntent = mDriveServiceHelper.createFilePickerIntent();
+
+            // The result of the SAF Intent is handled in onActivityResult.
+            startActivityForResult(pickerIntent, RC_OPEN_DOCUMENT);
+        }
+    }
+    */
+
+    //restore database file
+    public void restoreDB(){
+        if (! isInternetAvailable()){
+            Toast.makeText(MainActivity.this, "No internet available", Toast.LENGTH_SHORT).show();
+        }else {
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+            if (account == null){
+                Toast.makeText(MainActivity.this, "please sign in first...",Toast.LENGTH_LONG).show();
             } else {
-                startDriveRestore();
+                setDriveServiceHelper();
+                if(mDriveServiceHelper != null){
+                    mDriveServiceHelper.downloadDBFile(new File(MainActivity.this.getDatabasePath(db_name).toString()))
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    //restart activity
+                                    finish();
+                                    startActivity(getIntent());
+                                    Toast.makeText(MainActivity.this,"Database restored successfully!!",Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(MainActivity.this,"Failed to restore !!",Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+                }
             }
         }
     }
 
-    private GoogleSignInClient buildGoogleSignInClient() {
-        GoogleSignInOptions signInOptions =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestScopes(Drive.SCOPE_FILE)
-                        .build();
-        return GoogleSignIn.getClient(this, signInOptions);
-    }
+
 
     private void signOut(){
         GoogleSignInClient mGoogleSignInClient = buildGoogleSignInClient();
@@ -287,139 +371,6 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void startDriveBackup(){
-        mDriveResourceClient.createContents()
-                .continueWithTask(new Continuation<DriveContents, Task<Void>>() {
-                    @Override
-                    public Task<Void> then(@NonNull Task<DriveContents> task) throws Exception {
-                        return createFileIntentSender(task.getResult());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Failed to create new contents.", e);
-                    }
-                });
-    }
-
-    private Task<Void> createFileIntentSender(DriveContents driveContents){
-        final String inFileName = MainActivity.this.getDatabasePath(db_name).toString();
-        try{
-            File dbFile = new File(inFileName);
-            FileInputStream fis = new FileInputStream(dbFile);
-            OutputStream outputStream = driveContents.getOutputStream();
-
-            //transfer bytes from input file to output file
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = fis.read(buffer)) > 0){
-                outputStream.write(buffer, 0, length);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                .setTitle("attendance.db")
-                .setMimeType("application/db")
-                .build();
-
-
-        CreateFileActivityOptions createFileActivityOptions = new CreateFileActivityOptions.Builder()
-                .setInitialMetadata(metadataChangeSet)
-                .setInitialDriveContents(driveContents)
-                .build();
-
-
-        return mDriveClient.newCreateFileActivityIntentSender(createFileActivityOptions)
-                .continueWith(new Continuation<IntentSender, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<IntentSender> task) throws Exception {
-                        MainActivity.this.startIntentSenderForResult(task.getResult(), RC_CREATION, null, 0, 0, 0);
-                        return null;
-                    }
-                });
-
-    }
-
-    //drive restore
-    private void startDriveRestore(){
-        pickFile().addOnSuccessListener(MainActivity.this, new OnSuccessListener<DriveId>() {
-            @Override
-            public void onSuccess(DriveId driveId) {
-                MainActivity.this.retrieveContents(driveId.asDriveFile());
-            }
-        })
-                .addOnFailureListener(MainActivity.this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this, "Failed to restore db file", Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
-    private Task<DriveId> pickFile(){
-        OpenFileActivityOptions openFileActivityOptions = new OpenFileActivityOptions.Builder()
-                .setSelectionFilter(Filters.eq(SearchableField.MIME_TYPE, "application/db"))
-                .setActivityTitle("Select Database File")
-                .build();
-        return pickItem(openFileActivityOptions);
-    }
-
-    private Task<DriveId> pickItem(OpenFileActivityOptions openFileActivityOptions){
-        mOpenItemTaskSource = new TaskCompletionSource<>();
-        mDriveClient.newOpenFileActivityIntentSender(openFileActivityOptions)
-                .continueWith(new Continuation<IntentSender, Void>() {
-                    @Override
-                    public Void then(@NonNull Task<IntentSender> task) throws Exception {
-                        MainActivity.this.startIntentSenderForResult(task.getResult(), RC_OPENING, null, 0, 0, 0);
-                        return null;
-                    }
-                });
-        return mOpenItemTaskSource.getTask();
-    }
-
-    private void retrieveContents(DriveFile file){
-        final String inFileName = MainActivity.this.getDatabasePath(db_name).toString();
-
-        Task<DriveContents> openFileTask = mDriveResourceClient.openFile(file, DriveFile.MODE_READ_ONLY);
-
-        openFileTask.continueWithTask(new Continuation<DriveContents, Task<Void>>() {
-            @Override
-            public Task<Void> then(@NonNull Task<DriveContents> task) throws Exception {
-                DriveContents contents = task.getResult();
-                try {
-                    ParcelFileDescriptor parcelFileDescriptor = contents.getParcelFileDescriptor();
-                    FileInputStream fileInputStream = new FileInputStream(parcelFileDescriptor.getFileDescriptor());
-                    //open empty db file as the output stream
-                    OutputStream outputStream = new FileOutputStream(inFileName);
-                    //transfer bytes from the input file to output file
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = fileInputStream.read(buffer)) > 0) {
-                        outputStream.write(buffer, 0, length);
-                    }
-                    //close the streams
-                    outputStream.flush();
-                    outputStream.close();
-                    fileInputStream.close();
-                    Toast.makeText(MainActivity.this, "Import completed :)", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this, MainActivity.class));
-                } catch (Exception e){
-                    Toast.makeText(MainActivity.this, "Error on Import",Toast.LENGTH_SHORT).show();
-                }
-                return mDriveResourceClient.discardContents(contents);
-
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this, "Unable to read contents...", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -427,33 +378,29 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case RC_SIGN_IN:
                 // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-                if (resultCode == RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
                     // The Task returned from this call is always completed, no need to attach
                     // a listener.
                     Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                    handleSignInResult(task);
+                    handleSignInResult(data);
+                    handleSignInForUIData(task);
+
                 }
                 break;
-            case RC_CREATION:
-                // Called after a file is saved to Drive.
-                if (resultCode == RESULT_OK) {
-                    Log.i(TAG, "Backup successfully saved.");
-                    Toast.makeText(this, "Backup successfully loaded!", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case RC_OPENING:
-                if (resultCode == RESULT_OK) {
-                    DriveId driveId = data.getParcelableExtra(
-                            OpenFileActivityOptions.EXTRA_RESPONSE_DRIVE_ID);
-                    MainActivity.this.mOpenItemTaskSource.setResult(driveId);
-                } else {
-                    MainActivity.this.mOpenItemTaskSource.setException(new RuntimeException("Unable to open file"));
-                }
         }
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+    private void openFileFromFilePicker(Uri uri){
+        if (mDriveServiceHelper != null){
+            Log.d(TAG, "opening file uri : "+uri);
+            mDriveServiceHelper.downloadFileUsingStorageAccessFramework(uri);
+
+        }
+    }
+
+    private void handleSignInForUIData(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             // Signed in successfully, show authenticated UI.
@@ -466,6 +413,31 @@ public class MainActivity extends AppCompatActivity
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
         }
+    }
+
+    private void handleSignInResult(Intent result) {
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount googleAccount) {
+                        // Use the authenticated account to sign in to the Drive service.
+                        GoogleAccountCredential credential =
+                                GoogleAccountCredential.usingOAuth2(
+                                        MainActivity.this, Collections.singleton(DriveScopes.DRIVE_FILE));
+                        credential.setSelectedAccount(googleAccount.getAccount());
+                        Drive googleDriveService =
+                                new Drive.Builder(
+                                        AndroidHttp.newCompatibleTransport(),
+                                        new GsonFactory(),
+                                        credential)
+                                        .setApplicationName("Attendance App")
+                                        .build();
+
+                        // The DriveServiceHelper encapsulates all REST API and SAF functionality.
+                        // Its instantiation is required before handling any onClick actions.
+                        mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+                    }
+                });
     }
 
     private void updateHeaderUI(GoogleSignInAccount account){
@@ -567,14 +539,14 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.homeid) {
             startActivity(new Intent(MainActivity.this,MainActivity.class));
         } else if (id == R.id.uploadid) {
-            connectToDrive(true);
+            backupDB();
         } else if (id == R.id.restore_id){
-            connectToDrive(false);
+            createConfirmDialog();
         } else if (id == R.id.contactid) {
-            scheduleJob();
+            //scheduleJob();
 
         } else if (id == R.id.shareid) {
-            cancelJob();
+            //cancelJob();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -582,12 +554,45 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    //confirmation dialog to restore database
+    private void createConfirmDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Are you know what is happening?")
+                .setMessage("If you confirm, the present database will be lost and your google drive's backup database will be restored in the app." +
+                        "\n\nBe sure what you actually want?")
+                .setPositiveButton("Confirm", new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //restore database file
+                        restoreDB();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel", new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     public void scheduleJob(){
         ComponentName componentName  = new ComponentName(MainActivity.this, DatabaseUploadJobService.class);
+        //put extra info
+        //setDriveServiceHelper();
+        //Info mInfo = new Info(mainActivity, mDriveServiceHelper);
+        //Gson g = new Gson();
+        //String json = g.toJson(mInfo);
+
+        //PersistableBundle bundle = new PersistableBundle();
+        //bundle.putString("mInfo", json);
         JobInfo jobInfo = new JobInfo.Builder(jobID, componentName)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
-                .setPeriodic(12*60*60*1000)
+                .setPeriodic(15*60*1000)
+                //.setExtras(bundle)
                 .build();
         JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         int resultCode = jobScheduler.schedule(jobInfo);
@@ -633,6 +638,8 @@ public class MainActivity extends AppCompatActivity
                         return true;
                     case R.id.deleteid:
                         database_helper.deleteCourse(courses.get(position).get_course_id());
+                        //give trigger
+                        //scheduleJob();
                         finish();
                         startActivity(getIntent());
                         return true;
@@ -642,6 +649,5 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
 
 }

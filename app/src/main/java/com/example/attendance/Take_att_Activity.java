@@ -17,6 +17,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.attendance.MainActivity.mainActivity;
+
 public class Take_att_Activity extends AppCompatActivity {
     private NonScrollableListView listView;
     private Take_att_adapter take_att_adapter;
@@ -116,6 +118,7 @@ public class Take_att_Activity extends AppCompatActivity {
                         Toast.makeText(Take_att_Activity.this, "Today's  attendance is stored.", Toast.LENGTH_SHORT).show();
                         database_helper.AddColumn(table_name, new_col_name);
                         database_helper.InsertTodaysAtt(table_name, new_col_name, list);
+                        mainActivity.scheduleJob();
                         //finish();
                         onBackPressed();
 

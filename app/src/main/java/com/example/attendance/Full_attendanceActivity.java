@@ -17,6 +17,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.attendance.MainActivity.mainActivity;
+
 public class Full_attendanceActivity extends AppCompatActivity {
 
     private TextView rollView, percentageView, marksView, presentView, absentView;
@@ -66,6 +68,7 @@ public class Full_attendanceActivity extends AppCompatActivity {
                             listData.clear();
                             Initialize();
                             full_attendance_adapter.notifyDataSetChanged();
+                            mainActivity.scheduleJob();
                             dialog.dismiss();
                         } else {
                             //update database
@@ -75,6 +78,7 @@ public class Full_attendanceActivity extends AppCompatActivity {
                             listData.clear();
                             Initialize();
                             full_attendance_adapter.notifyDataSetChanged();
+                            mainActivity.scheduleJob();
                             dialog.dismiss();
                         }
                     }
@@ -124,6 +128,7 @@ public class Full_attendanceActivity extends AppCompatActivity {
         if (cursor != null) {
             while(cursor.moveToNext()){
                 roll = cursor.getString(cursor.getColumnIndex("roll_no"));
+                getSupportActionBar().setTitle(roll);
                 String p_att =cursor.getString(cursor.getColumnIndex("p_att"));
                 String marks = cursor.getString(cursor.getColumnIndex("marks"));
                 String attend = cursor.getString(cursor.getColumnIndex("attend"));

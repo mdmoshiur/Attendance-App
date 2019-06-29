@@ -7,5 +7,6 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_display_courses">Display_coursesActivity</string>
+    <string name="clientId">984612778709-58jlqgshanhkmrt3q27q7u2mdq0fit19.apps.googleusercontent.com</string>
 
 </resources>

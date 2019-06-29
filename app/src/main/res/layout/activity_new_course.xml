@@ -63,7 +63,7 @@
             android:id="@+id/course_name_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Course Name*"
+            android:hint="Course No*"
             android:inputType="textCapCharacters"
             android:singleLine="true" />
     </android.support.design.widget.TextInputLayout>

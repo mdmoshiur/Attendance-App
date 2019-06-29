@@ -9,7 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class new_course_activity extends AppCompatActivity implements View.OnClickListener {
+import static com.example.attendance.MainActivity.mainActivity;
+
+public class new_course_activity extends AppCompatActivity{
 
     private EditText Series_name,Dept_name,Section, Course_name, Start, End, Others;
     private Button button;
@@ -39,94 +41,62 @@ public class new_course_activity extends AppCompatActivity implements View.OnCli
         button = findViewById(R.id.create_buttun_id);
 
         database_helper = new Database_helper(this);
-        SQLiteDatabase sqLiteDatabase = database_helper.getWritableDatabase();
+        //SQLiteDatabase sqLiteDatabase = database_helper.getWritableDatabase();
 
-        button.setOnClickListener(this);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String series = Series_name.getText().toString().trim();
+                    String dept = Dept_name.getText().toString().trim();
+                    String section = Section.getText().toString().trim();
+                    String course_name = Course_name.getText().toString().trim();
+                    String start = Start.getText().toString().trim();
+                    String end = End.getText().toString().trim();
+                    String others = null;
+                    if(Others.getText()!= null){
+                        others = Others.getText().toString().trim();
+                    }
 
-    }
-    /*
-    //background thread
-    class MyRunnable implements Runnable {
-        @Override
-        public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Intent intent = new Intent(new_course_activity.this, MainActivity.class);
-                    startActivity(intent);
-                }
-            });
-            database_helper.create_attendance_table(mtable_name, mstrat, mend, mothers_roll);
-            database_helper.insertRow(mtable_name, mstrat, mend, mothers_roll);
-        }
-    }
-    */
+                    //create buttun is clicked
+                    Integer starting_roll = Integer.parseInt(start);
+                    Integer ending_roll = Integer.parseInt(end);
+                    //Integer others_roll = Integer.parseInt(others);
 
-    @Override
-    public void onClick(View v) {
-        try {
-            String series = Series_name.getText().toString().trim();
-            String dept = Dept_name.getText().toString().trim();
-            String section = Section.getText().toString().trim();
-            String course_name = Course_name.getText().toString().trim();
-            String start = Start.getText().toString().trim();
-            String end = End.getText().toString().trim();
-            String others = null;
-            if(Others.getText()!= null){
-                 others = Others.getText().toString().trim();
-            }
+                    if(series  == null || section == null || dept == null || course_name == null || start == null || end == null) {
+                        Toast.makeText(new_course_activity.this,"Fill up all required fields correctly",Toast.LENGTH_SHORT).show();
+                    } else if(starting_roll >= ending_roll) {
+                        Toast.makeText(new_course_activity.this, "Ending roll must be greater than starting roll", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // textView.setText(" "+series+dept+section+course_name);
+                        long row_id = database_helper.insertData(series,dept,section,course_name,starting_roll,ending_roll,others);
+                        if(row_id!=-1){
+                            ///String table_name = course_name + dept + series + section + starting_roll;
+                            //eliminate space for table name
+                            //table_name = table_name.replaceAll("\\s","");
+                            String table_name = "attendance_table_"+row_id;
+                            //Log.d("tag",table_name);
 
-            //create buttun is clicked
-            Integer starting_roll = Integer.parseInt(start);
-            Integer ending_roll = Integer.parseInt(end);
-            //Integer others_roll = Integer.parseInt(others);
+                            database_helper.create_attendance_table(table_name);
+                            database_helper.insertRow(table_name, starting_roll, ending_roll, others);
 
-            if (v.getId()==R.id.create_buttun_id){
-                // textView.setText(" "+series+dept+section+course_name);
-                long row_id = database_helper.insertData(series,dept,section,course_name,starting_roll,ending_roll,others);
-                if(row_id!=-1){
-                    ///String table_name = course_name + dept + series + section + starting_roll;
-                    //eliminate space for table name
-                    //table_name = table_name.replaceAll("\\s","");
-                    String table_name = "attendance_table_"+row_id;
-                    //Log.d("tag",table_name);
+                            mainActivity.scheduleJob();
 
-                    database_helper.create_attendance_table(table_name);
-                    database_helper.insertRow(table_name, starting_roll, ending_roll, others);
+                            //Toast.makeText(getApplicationContext(),"Row  is successfully inserted",Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(new_course_activity.this, MainActivity.class);
+                            startActivity(intent);
 
-                    //Toast.makeText(getApplicationContext(),"Row  is successfully inserted",Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(new_course_activity.this, MainActivity.class);
-                    startActivity(intent);
-
-                    /*
-                    // performance issues
-                    mtable_name = table_name;
-                    mstrat = starting_roll;
-                    mend = ending_roll;
-                    mothers_roll = others;
-
-
-                    //call for other thread
-                    MyRunnable runnable = new MyRunnable();
-                    new Thread(runnable).start();
-                    /*
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            database_helper.create_attendance_table(mtable_name, mstrat, mend, mothers_roll);
-                            database_helper.insertRow(mtable_name, mstrat, mend, mothers_roll);
+                        } else {
+                            Toast.makeText(getApplicationContext(),"New course not inserted",Toast.LENGTH_SHORT).show();
                         }
-                    }).start();
-                    */
 
-                } else {
-                    Toast.makeText(getApplicationContext(),"Row  is not inserted",Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e){
+                    Toast.makeText(getApplicationContext(),"Fill up all required fields correctly",Toast.LENGTH_SHORT).show();
                 }
-
             }
-        } catch (Exception e){
-            Toast.makeText(getApplicationContext(),"Exception is found ",Toast.LENGTH_SHORT).show();
-        }
+        });
+
     }
 }
 

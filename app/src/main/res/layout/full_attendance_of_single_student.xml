@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Roll No: 1503113"
-                android:textColor="#CE0808"
+                android:textColor="#2196F3"
                 android:textStyle="bold"
                 android:textSize="32sp"
                 android:layout_alignParentTop="true"

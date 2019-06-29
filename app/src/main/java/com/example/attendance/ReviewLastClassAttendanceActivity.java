@@ -18,6 +18,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.attendance.MainActivity.mainActivity;
+
 public class ReviewLastClassAttendanceActivity extends AppCompatActivity {
     private String table_name;
     private String new_col_name;
@@ -52,6 +54,7 @@ public class ReviewLastClassAttendanceActivity extends AppCompatActivity {
                         Toast.makeText(ReviewLastClassAttendanceActivity.this, "Last class attendance is updated.", Toast.LENGTH_SHORT).show();
                         //update last column
                         database_helper.updateLastAttendance(table_name, reviewList, previousList);
+                        mainActivity.scheduleJob();
                         //finish();
                         onBackPressed();
 
@@ -164,6 +167,7 @@ public class ReviewLastClassAttendanceActivity extends AppCompatActivity {
                 Database_helper database_helper2 = new Database_helper(ReviewLastClassAttendanceActivity.this);
                 database_helper2.AddColumn(table_name, new_col_name);
                 database_helper2.InsertTodaysAtt(table_name, new_col_name, reviewList);
+                mainActivity.scheduleJob();
                 //finish();
                 onBackPressed();
 
