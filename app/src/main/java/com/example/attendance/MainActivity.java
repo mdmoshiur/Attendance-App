@@ -55,7 +55,6 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
-import com.google.gson.Gson;
 
 
 import java.io.File;
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity
 
     //for google sign in and drive api
     private static final int RC_SIGN_IN = 0;
+    private static final int RC_OPEN_DOCUMENT = 1;
 
     //for rest api
     private DriveServiceHelper mDriveServiceHelper;
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity
         File dbFile = new File(dbFilePath);
         return dbFile;
     }
-    /*
+
     //filepicker
     private void openFilePicker(){
         if (mDriveServiceHelper != null) {
@@ -322,7 +322,6 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(pickerIntent, RC_OPEN_DOCUMENT);
         }
     }
-    */
 
     //restore database file
     public void restoreDB(){
@@ -333,9 +332,11 @@ public class MainActivity extends AppCompatActivity
             if (account == null){
                 Toast.makeText(MainActivity.this, "please sign in first...",Toast.LENGTH_LONG).show();
             } else {
-                String timeStamp = new SimpleDateFormat("dd_MM_yyyy").format(Calendar.getInstance().getTime());
-                String dbOldFileName = "Attendance_oldFile_date_" +timeStamp+".db";
+                //String timeStamp = new SimpleDateFormat("dd_MM_yyyy").format(Calendar.getInstance().getTime());
+                //String dbOldFileName = "Att_App_OldDB_" +timeStamp+".db";
                 setDriveServiceHelper();
+                openFilePicker();
+                /*
                 if(mDriveServiceHelper != null){
                     mDriveServiceHelper.downloadDBFile(getDBFile(), dbOldFileName, new File(MainActivity.this.getDatabasePath(db_name).toString()))
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -355,6 +356,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                             });
                 }
+                */
             }
         }
     }
@@ -391,17 +393,40 @@ public class MainActivity extends AppCompatActivity
 
                 }
                 break;
+
+            case RC_OPEN_DOCUMENT:
+                if (resultCode == RESULT_OK && data != null) {
+                    Uri uri = data.getData();
+                    Log.d(TAG," i am now at request code here");
+                    Log.d(TAG,"selected file uri: " + uri);
+                    if (uri != null && mDriveServiceHelper != null) {
+                        String timeStamp = new SimpleDateFormat("dd_MM_yyyy").format(Calendar.getInstance().getTime());
+                        String dbOldFileName = "Att_App_OldDB_" +timeStamp+".db";
+                        mDriveServiceHelper.download_Replace_DBFile(MainActivity.this, getDBFile(), dbOldFileName, uri)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //restart activity
+                                        finish();
+                                        startActivity(getIntent());
+                                        Toast.makeText(MainActivity.this, "Database Imported :)", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(MainActivity.this, " Import failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                    }
+                } else {
+                    Log.d(TAG, "Unable to download file.");
+                }
+                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
 
-    }
-
-    private void openFileFromFilePicker(Uri uri){
-        if (mDriveServiceHelper != null){
-            Log.d(TAG, "opening file uri : "+uri);
-            mDriveServiceHelper.downloadFileUsingStorageAccessFramework(uri);
-
-        }
     }
 
     private void handleSignInForUIData(Task<GoogleSignInAccount> completedTask) {
@@ -547,7 +572,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.restore_id){
             createConfirmDialog();
         } else if (id == R.id.contactid) {
-           
+
         } else if (id == R.id.shareid) {
             //cancelJob();
         }
@@ -561,7 +586,7 @@ public class MainActivity extends AppCompatActivity
     private void createConfirmDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Are you know what is happening?")
-                .setMessage("If you confirm, the present database will be lost and your google drive's backup database will be restored in the app." +
+                .setMessage("If you confirm, the present database will be stored as an old database in google drive and the selected backup database will be restored in the app." +
                         "\n\nBe sure what you actually want?")
                 .setPositiveButton("Confirm", new OnClickListener() {
                     @Override
@@ -594,7 +619,6 @@ public class MainActivity extends AppCompatActivity
         JobInfo jobInfo = new JobInfo.Builder(jobID, componentName)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
-                .setPeriodic(15*60*1000)
                 //.setExtras(bundle)
                 .build();
         JobScheduler jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
